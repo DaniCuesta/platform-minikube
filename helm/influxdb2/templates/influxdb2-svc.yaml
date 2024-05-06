@@ -4,10 +4,7 @@ metadata:
   name: {{ .Values.nameOverride }}
   labels:
     app: {{ .Values.service.name }}
-  annotations:
-    {{- with .Values.service.annotations }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }} 
+  annotations: {{ .Values.service.annotations }}
 spec:
   type: {{ .Values.service.type }}
   selector:
