@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: influx:telegraf
+rules:
+- apiGroups: ["*"]  # Permite acceso a todos los grupos de API
+  resources: ["*"]  # Permite acceso a todos los recursos
+  verbs: ["*"]      # Permite realizar todas las acciones

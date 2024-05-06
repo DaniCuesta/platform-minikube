@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.fullname }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.selectorLabels.name }}
+    app.kubernetes.io/instance: {{ .Values.selectorLabels.instance }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.selectorLabels.name }}

@@ -1,0 +1,104 @@
+# Número de réplicas
+replicaCount: 1
+
+# Configuración de la imagen de Docker
+image:
+  repo: "docker.io/library/telegraf"
+  tag: "1.30-alpine"
+  pullPolicy: IfNotPresent
+
+# Etiquetas y nombre completo
+fullname: "telegraf"
+selectorLabels:
+            name: "telegraf"
+            instance: "telegraf-instance"
+
+# Configuración del Service Account
+serviceAccountName: "telegraf-service-account"
+
+# Configuración de ConfigMap
+configMapName: "telegraf-config-map"
+
+# Variables de entorno
+hostname: "telegraf-polling-service"
+
+# Configuración del servicio
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+
+# Recursos y política de arranque
+resources: {}
+updateStrategy: {}
+securityContext: {}
+containerSecurityContext: {}
+volumeMounts:
+  - name: config
+    mountPath: /etc/telegraf
+volumes:
+  - name: config
+    configMap:
+      name: "telegraf-config-map"
+
+# Configuraciones de RBAC
+rbac:
+  create: true
+  clusterWide: false
+  rules:
+    - apiGroups: [""]
+      resources: ["pods", "configmaps"]
+      verbs: ["get", "list", "watch"]
+
+# Configuración de PodDisruptionBudget
+pdb:
+  create: true
+  minAvailable: 1
+
+# Configuración de Telegraf
+config:
+  agent:
+    interval: "10s"
+    round_interval: true
+    metric_batch_size: 1000
+    metric_buffer_limit: 10000
+    collection_jitter: "0s"
+    flush_interval: "10s"
+    flush_jitter: "0s"
+    debug: false
+    quiet: false
+    hostname: "$HOSTNAME"
+    omit_hostname: false
+  processors:
+    - enum:
+        mapping:
+          field: "status"
+          dest: "status_code"
+          value_mappings:
+            healthy: 1
+            problem: 2
+            critical: 3
+  outputs:
+    - influxdb:
+        urls:
+          - "http://influxdb.monitoring.svc:8086"
+        database: "telegraf"
+  inputs:
+    - statsd:
+        service_address: ":8125"
+        percentiles:
+          - 50
+          - 95
+          - 99
+        metric_separator: "_"
+        allowed_pending_messages: 10000
+        percentile_limit: 1000
+
+metrics:
+  health:
+    enabled: false
+    service_address: "http://:8888"
+    threshold: 5000.0
+  internal:
+    enabled: true
+    collect_memstats: false
