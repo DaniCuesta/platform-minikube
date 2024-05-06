@@ -9,7 +9,7 @@ fullnameOverride: ""
 serviceAccount:
   create: true
   name: influxdb2
-  namespace: danicuestam-dev
+  namespace: monitoring
 
 influxdb:
   name: influxdb2
