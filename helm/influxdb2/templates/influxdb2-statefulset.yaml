@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.nameOverride | default "influxdb2" }}
+spec:
+  serviceName: "influxdb"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb2
+  template:
+    metadata:
+      labels:
+        app: influxdb2
+        network.openshift.io/policy-group: "ingress"
+    spec:
+      imagePullSecrets:
+      - name: quay-credentials
+      serviceAccountName: {{ .Values.serviceAccount.name | default "influxdb2" }}
+      containers:
+      - name: influxdb2
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: {{ .Values.service.port }}
+        volumeMounts:
+        - name: influxdb2-data
+          mountPath: {{ .Values.influxdb.persistence.mountPath }}
+        - name: influxdb2-config
+          mountPath: {{ .Values.influxdb.persistence.configPath }}
+        env:
+        - name: DOCKER_INFLUXDB_INIT_MODE
+          value: {{ .Values.influxdb.initMode }}
+        - name: DOCKER_INFLUXDB_INIT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.credentials.name }}
+              key: {{ .Values.secrets.credentials.usernameKey }}
+        - name: DOCKER_INFLUXDB_INIT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.credentials.name }}
+              key: {{ .Values.secrets.credentials.passwordKey }}
+        - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.token.name }}
+              key: {{ .Values.secrets.token.tokenKey }}
+        - name: DOCKER_INFLUXDB_INIT_ORG
+          value: {{ .Values.influxdb.initOrg }}
+        - name: DOCKER_INFLUXDB_INIT_BUCKET
+          value: {{ .Values.influxdb.initBucket }}
+        - name: DOCKER_INFLUXDB_INIT_RETENTION
+          value: {{ .Values.influxdb.initRetention }}
+        - name: INFLUXD_BOLT_PATH
+          value: {{ .Values.influxdb.initBoltPath }}
+        - name: INFLUXD_ENGINE_PATH
+          value: {{ .Values.influxdb.initEnginePath }}
+        # livenessProbe:
+        #   httpGet:
+        #     path: {{ .Values.probes.liveness.path }}
+        #     port: http
+        #   initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+        #   periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+        #   timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+        #   failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+        # readinessProbe:
+        #   httpGet:
+        #     path: {{ .Values.probes.readiness.path }}
+        #     port: http
+        #   initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+        #   periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+        #   timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+        #   successThreshold: {{ .Values.probes.readiness.successThreshold }}
+        #   failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+        # startupProbe:
+        #   httpGet:
+        #     path: {{ .Values.probes.startup.path }}
+        #     port: http
+        #   initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+        #   periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+        #   timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+        #   failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+        resources:
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+      volumes:
+      - name: influxdb2-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.influxdb.persistence.claimName }}
+      - name: influxdb2-config
+        configMap:
+          name: {{ .Values.influxdb.persistence.configClaimName }}

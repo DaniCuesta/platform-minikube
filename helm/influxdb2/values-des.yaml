@@ -1,0 +1,107 @@
+image:
+  repository: docker.io/influxdb
+  tag: "2.7.6"
+  pullPolicy: IfNotPresent
+
+nameOverride: "influxdb2"
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  name: influxdb2
+  namespace: danicuestam-dev
+
+influxdb:
+  name: influxdb2
+  initMode: "setup"
+  initOrg: "DES"
+  initBucket: "TELEGRAF"
+  initRetention: "30d"
+  initBoltPath: "/var/lib/influxdb2/influxd.bolt"
+  initEnginePath: "/var/lib/influxdb2/engine"
+  persistence:
+    enabled: true
+    size: 10Gi
+    accessMode: ReadWriteOnce
+    mountPath: "/var/lib/influxdb2"
+    configPath: "/var/lib/influxdb2-config"
+    claimName: "influxdb-pvc"
+    configClaimName: "influxdb-config"
+
+secrets:
+  credentials:
+    name: influxdb-credentials
+    usernameKey: initUsername
+    passwordKey: initPassword
+  token:
+    name: influxdb-token
+    tokenKey: token
+    
+probes:
+  liveness:
+    path: "/health"
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    path: "/health"
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+    failureThreshold: 3
+  startup:
+    enabled: true
+    path: "/health"
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+service:
+  type: ClusterIP
+  port: 8086
+  targetPort: 8086
+  annotations: {}
+  labels: {}
+  portName: http-influxdb2
+
+
+route:
+  enabled: true
+  name: influxdb2
+  labels:
+    app: influxdb2
+  annotations: {}
+  spec:
+    to:
+      kind: Service
+      name: influxdb2
+      weight: 100
+    port:
+      targetPort: 8086
+    wildcardPolicy: None
+
+pdb:
+  create: true
+  minAvailable: 1
+  # maxUnavailable: 1
+
+initScripts:
+  enabled: false
+  scripts: {}

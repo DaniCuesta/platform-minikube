@@ -1,0 +1,22 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.route.name }}
+  labels:
+    app: {{ .Values.route.labels.app }}
+    release: "{{ .Release.Name }}"  
+    heritage: "{{ .Release.Service }}"  
+  annotations:
+    {{- with .Values.route.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  to:
+    kind: {{ .Values.route.spec.to.kind }}
+    name: {{ .Values.route.spec.to.name }}
+    weight: {{ .Values.route.spec.to.weight }}
+  port:
+    targetPort: {{ .Values.route.spec.port.targetPort }}
+  wildcardPolicy: {{ .Values.route.spec.wildcardPolicy }}
+{{- end }}
