@@ -4,9 +4,6 @@ metadata:
   name: {{ .Values.nameOverride }}
   labels:
     app: {{ .Values.service.name }}
-    {{- with .Values.service.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
   annotations:
     {{- with .Values.service.annotations }}
     {{- toYaml . | nindent 4 }}
