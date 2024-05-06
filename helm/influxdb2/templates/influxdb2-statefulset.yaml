@@ -14,8 +14,6 @@ spec:
         app: influxdb2
         network.openshift.io/policy-group: "ingress"
     spec:
-      imagePullSecrets:
-      - name: quay-credentials
       serviceAccountName: {{ .Values.serviceAccount.name | default "influxdb2" }}
       containers:
       - name: influxdb2
