@@ -18,7 +18,7 @@ data:
       flush_jitter = "0s"
       precision = ""
 
-    [[outputs.influxdb]]
+    [[outputs.influxdb_v2]]
       urls = ["http://influxdb2:8086"]
       bucket = "TELEGRAF"
       token = "UxDdvLxdYdcDwLIEiER7OE"
