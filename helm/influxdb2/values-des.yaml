@@ -78,8 +78,10 @@ service:
   port: 8086
   targetPort: 8086
   annotations: {}
-  labels: {}
+  labels: 
+    app: influxdb2
   portName: http-influxdb2
+
 
 
 route:
