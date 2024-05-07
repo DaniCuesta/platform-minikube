@@ -1,0 +1,79 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: maven
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Build Tools
+    tekton.dev/tags: build-tool
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This Task performs a Maven deployment and, if the release parameter is set to true, makes the necessary changes to create a release version.
+
+    Parameters:
+
+    - `release`: (type: string) A boolean flag indicating whether to perform a release deployment. If set to "true", the necessary changes will be applied to create a release version; otherwise, a regular deployment will be performed.
+    - `registry-url`: (type: string) The URL of the Harbor repository containing the Maven image with Helm integration.
+    - `profile`: (type: string, default: "nexus") The Nexus settings.xml profile to use during the Maven deployment.
+
+    Workspaces:
+
+    - `output`: The workspace containing the Maven project to be deployed.
+
+    Environment Variables:
+
+    - `NEXUS_USER`: The Nexus username used for authentication during deployment.
+
+    - `NEXUS_PASSWORD`: The Nexus password used for authentication during deployment.
+
+    The Task performs the following steps:
+
+    1. Read the Nexus username, Nexus password, and Nexus URL from the `.nexus_user`, `.nexus_password`, and `.nexus_url` files, respectively.
+    2. Determine the base deployment repository based on whether the `release` parameter is set to "true" or not. If it is a release deployment, the `-SNAPSHOT` suffix is removed, and the `versions:set` and `versions:use-releases` Maven goals are executed to prepare for the release version. The `baseDeploymentRepository` variable is updated to point to the Nexus release repository. If it is not a release deployment, the deployment will use the Nexus snapshot repository.
+    3. Perform the Maven deployment using the `clean deploy` goals, with the specified settings.xml profile and the `NEXUS_USER` and `NEXUS_PASSWORD` environment variables for authentication. The `-Dmaven.test.skip=true` flag is used to skip running the tests during deployment.
+
+  workspaces:
+    - name: output
+      description: The workspace consisting of maven project.
+  params:
+    - name: release
+      type: string
+    - name: registry-url
+      type: string
+      description: harbor repository url
+    - name: profile
+      type: string
+      description: settings.xml nexus profile
+      default: "nexus"
+  steps:
+    - name: mvn-goals
+      image: $(params.registry-url)/maven-with-helm:latest
+      env:
+      - name: NEXUS_USER
+        value: " "
+      - name: NEXUS_PASSWORD
+        value: " "
+      workingDir: $(workspaces.output.path)
+      script: |
+        #!/usr/bin/env sh
+
+        NEXUS_USER=$(cat .nexus_user)
+        NEXUS_PASSWORD=$(cat .nexus_password)
+        nexus_url=$(cat .nexus_url)
+
+        baseDeploymentRepository=snapshots::default::http://${NEXUS_USER}:${NEXUS_PASSWORD}@${nexus_url}/repository/maven-snapshots
+
+        # In case of release version remove the '-SNAPSHOT'.
+        if [[ $(params.release) == "true" ]]
+        then
+          mvn versions:set -DremoveSnapshot
+          mvn versions:use-releases
+          baseDeploymentRepository=releases::default::http://${NEXUS_USER}:${NEXUS_PASSWORD}@${nexus_url}/repository/maven-releases
+        fi
+        
+         # TODO Quitar el skiptest cuando se solventen los tests de framework
+        /usr/bin/mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}

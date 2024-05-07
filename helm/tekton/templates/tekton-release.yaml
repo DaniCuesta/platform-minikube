@@ -2586,7 +2586,7 @@ spec:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: tekton-pipelines-resolvers
+  name: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
