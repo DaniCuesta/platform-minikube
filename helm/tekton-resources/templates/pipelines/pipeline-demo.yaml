@@ -18,11 +18,7 @@ spec:
         name: git-clone
       params:
         - name: url
-        {{- if eq $element.tenant "sicf" }}
-          value: {{ $.Values.url.git.host }}/scfp/back/{{ $name }}.git
-        {{- else }}
-          value: {{ $.Values.url.git.host }}/{{ $element.tenant }}/back/{{ $name }}.git
-        {{- end }}
+          value: 
         - name: revision
           value: $(params.revision)
       workspaces:
@@ -37,82 +33,9 @@ spec:
         - fetch-repository
       params:
         - name: registry-url
-          value: "{{ $.Values.url.harbor.imagesCustom }}"         
+          value: quay.io/danicuestam/maven-helm:latest        
       workspaces:
         - name: output
           workspace: shared-workspace
 
-          
-    - name: update-project-version
-      taskRef:
-        kind: task
-        name: update-version-mvn
-      runAfter: 
-        - maven-deploy
-      params:
-        - name: registry-url
-          value: "{{ $.Values.url.harbor.imagesCustom }}"
-      workspaces:
-        - name: output
-          workspace: shared-workspace
-
-    - name: create-build-config
-      taskRef:
-        kind: task
-        name: build-config-maven
-      runAfter:
-        - update-project-version
-      params:
-        - name: deployment-name
-          value: {{ $name }}
-        - name: image-stream
-          value: {{ $.Values.image.openjdk }}
-        - name: registry-url
-          value: "{{ $.Values.url.harbor.openshift }}"
-        - name: environment
-          value: {{ $.Values.promote.projectIni}}
-        - name: tenant
-          value: {{ $element.tenant }}
-      workspaces:
-        - name: output
-          workspace: shared-workspace
-    
-    - name: update-version-helm
-      taskRef:
-        kind: task
-        name: update-version-helm
-      runAfter:
-        - create-build-config
-      workspaces:
-      - name: output
-        workspace: shared-workspace
-      params:
-        - name: git-url
-        {{- if eq $element.tenant "sicf" }}
-          value: {{ $.Values.url.git.host }}/scfp/back
-        {{- else }}
-          value: {{ $.Values.url.git.host }}/{{ $element.tenant }}/back
-        {{- end }}
-        - name: git-helm-chart
-          value: {{ $.Values.url.git.host }}/{{ $.Values.url.git.commonchart }}
-        - name: deployment-name
-          value: {{ $name }}
-        - name: 
-          value: $(params.)
-        - name: component-type
-          value: {{ $element.tenant }}/{{ $service.path }}
-        - name: registry-url
-          value: "{{ $.Values.url.harbor.imagesCustom }}"
-        - name: trunk-branch-chart
-          value: "{{ $.Values.project.git.trunkBranchChart }}"
-        - name: trunk-branch-app
-          value: $(params.revision)
-        - name: development-environment
-          value: "{{ $.Values.buildEnvironment }}"        
-
-
----
-{{- end}}
-{{- end}}
-{{- end}}
-{{- end}}
+        
