@@ -1,14 +1,14 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: git-clone-pipeline-run-001  
+  name: git-clone-pipeline-run-001
   namespace: tekton-pipelines
 spec:
   pipelineRef:
     name: git-clone-pipeline
   params:
     - name: revision
-      value: "main"  # Ajusta esto a la rama que desees
+      value: "main"
   workspaces:
     - name: output
       workspace: shared-workspace
