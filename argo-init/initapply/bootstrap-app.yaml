@@ -1,7 +1,7 @@
 # apiVersion: argoproj.io/v1alpha1
 # kind: Application
 # metadata:
-#   name: platform-middleware
+#   name: platform-apps
 #   namespace: minikube-gitops
 # spec:
 #   project: default
