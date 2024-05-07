@@ -23,8 +23,6 @@ spec:
       workspaces:
         - name: output
           workspace: shared-workspace
-          persistentVolumeClaim:
-            claimName: pipelines-pvc
 
 
         
