@@ -1,0 +1,10 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: prueba-task
+spec:
+  steps:
+    - name: imprime-mensaje
+      image: docker.io/alpine:3.14
+      command: ["echo"]
+      args: ["¡Esta es una tarea de prueba en Tekton!"]

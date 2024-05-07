@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prueba-pipeline
+spec:
+  tasks:
+    - name: ejecuta-prueba-task
+      taskRef:
+        name: prueba-task
