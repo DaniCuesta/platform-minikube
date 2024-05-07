@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: middleware-appset
+  name: platform-middleware
   namespace: minikube-gitops
 spec:
   generators:
@@ -14,7 +14,7 @@ spec:
             project: default
   template:
     metadata:
-      name: '{{appName}}-{{cluster}}'
+      name: 'platform-{{appName}}-{{cluster}}'
     spec:
       project: '{{project}}'
       source:
