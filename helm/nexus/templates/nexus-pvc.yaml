@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: sonatype-registry-data
 spec:
-  storageClassName: sonatypestorage
+  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
