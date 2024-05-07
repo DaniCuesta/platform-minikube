@@ -23,12 +23,17 @@ data:
       bucket = "TELEGRAF"
       token = "UxDdvLxdYdcDwLIEiER7OE"
       organization = "DES" 
+      [outputs.influxdb_v2.tagpass]
+        influxdb_bucket = ["TELEGRAF"]
 
-    [[inputs.cpu]]
-      percpu = true
-      totalcpu = true
-      collect_cpu_time = false
-      report_active = false
+    [[inputs.kube_inventory]]
+      url = "https://kubernetes.default.svc"
+      bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      insecure_skip_verify = true
+      response_timeout = "5s"
+      namespace = ""
+      [inputs.kube_inventory.tags]
+        influxdb_bucket = "TELEGRAF"
 
 
 
