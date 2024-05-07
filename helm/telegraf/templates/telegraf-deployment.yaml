@@ -17,7 +17,7 @@ spec:
         app.kubernetes.io/name: {{ .Values.selectorLabels.name }}
         app.kubernetes.io/instance: {{ .Values.selectorLabels.instance }}
     spec:
-      serviceAccountName: {{ .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
       - name: telegraf
         image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
