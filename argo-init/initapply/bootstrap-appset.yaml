@@ -14,12 +14,12 @@ spec:
             project: default
   template:
     metadata:
-      name: 'bootstrap-{{appName}}-{{cluster}}'
+      name: 'boostrap-{{"{{appName}}"}}-{{"{{cluster}}"}}'
     spec:
-      project: '{{project}}'
+      project: '{{"{{project}}"}}'
       source:
-        repoURL: '{{repoURL}}'
+        repoURL: '{{"{{repoURL}}"}}'
         targetRevision: HEAD
-        path: 'bootstrap/{{cluster}}/{{appName}}'
+        path: 'bootstrap/{{"{{cluster}}"}}/{{"{{appName}}"}}'
       destination:
-        server: '{{url}}' 
+        server: 'https://kubernetes.default.svc'
