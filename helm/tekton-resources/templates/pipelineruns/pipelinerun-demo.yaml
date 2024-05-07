@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: git-clone-pipeline-run
+  name: git-clone-pipeline-run-001  # Nombre específico; incrementa manualmente para nuevas ejecuciones o automatiza con scripts
 spec:
   pipelineRef:
     name: git-clone-pipeline
@@ -17,3 +17,4 @@ spec:
           resources:
             requests:
               storage: 1Gi
+
