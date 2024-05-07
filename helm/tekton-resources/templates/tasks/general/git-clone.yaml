@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone-ssh
+spec:
+  params:
+    - name: repo-url
+      type: string
+      description: URL del repositorio de GitHub a clonar.
+    - name: revision
+      type: string
+      description: La rama o etiqueta a la que se debe hacer checkout.
+      default: "main"
+  workspaces:
+    - name: output
+      description: The git repo will be cloned onto the volume backing this Workspace.
+
+  steps:
+    - name: clone-repo
+      image: docker.io/alpine/git:v2.26.2
+      env:
+        - name: SSH_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: github-ssh-key
+              key: ssh-privatekey
+      script: |
+        #!/bin/sh
+        set -e
+
+        # Configurar el acceso SSH para git
+        mkdir -p ~/.ssh
+        echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+        # Clonar el repositorio
+        git clone -c core.sshCommand="ssh -i ~/.ssh/id_rsa" \
+            $(params.repo-url) $(workspaces.output.path)
+        cd $(workspaces.output.path)
+        git checkout $(params.revision)

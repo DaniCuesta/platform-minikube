@@ -1,41 +1,32 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pipeline-demo
-  namespace: cicd
+  name: git-clone-pipeline
 spec:
+  params:
+    - name: repo-url
+      type: string
+      description: URL del repositorio de GitHub a clonar.
+    - name: revision
+      type: string
+      description: La rama o etiqueta a la que se debe hacer checkout.
+      default: "main"
   workspaces:
     - name: shared-workspace
-  params:
-  - name: revision
-    type: string
-    description: Rama que se clonará. Cambiar para aplicar hotfixes.
-    default: "master"
+      description: Workspace compartido donde el repositorio será clonado.
+
   tasks:
-    - name: fetch-repository
+    - name: clone-repository
       taskRef:
-        kind: task
-        name: git-clone
+        name: git-clone-ssh
       params:
-        - name: url
-          value: 
+        - name: repo-url
+          value: $(params.repo-url)
         - name: revision
           value: $(params.revision)
       workspaces:
         - name: output
           workspace: shared-workspace
 
-    - name: maven-deploy
-      taskRef:
-        kind: task
-        name: maven
-      runAfter:
-        - fetch-repository
-      params:
-        - name: registry-url
-          value: quay.io/danicuestam/maven-helm:latest        
-      workspaces:
-        - name: output
-          workspace: shared-workspace
 
         
