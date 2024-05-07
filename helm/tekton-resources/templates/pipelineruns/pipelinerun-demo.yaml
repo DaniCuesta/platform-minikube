@@ -7,7 +7,7 @@ spec:
     name: git-clone-pipeline
   params:
     - name: revision
-      value: "develop"  # Ajusta esto a la rama que desees
+      value: "main"  # Ajusta esto a la rama que desees
   workspaces:
     - name: shared-workspace
       volumeClaimTemplate:
