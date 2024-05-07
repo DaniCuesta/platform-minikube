@@ -14,7 +14,7 @@ spec:
             project: default
   template:
     metadata:
-      name: 'bootstrap-{{appName}}-{{cluster}}'
+      name: '{{appName}}-{{cluster}}'
     spec:
       project: '{{project}}'
       source:
