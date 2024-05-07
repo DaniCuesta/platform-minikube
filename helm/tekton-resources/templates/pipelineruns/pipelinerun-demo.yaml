@@ -8,10 +8,20 @@ spec:
     name: git-clone-pipeline
   podTemplate:
     securityContext:
-      allowPrivilegeEscalation: false
-      runAsNonRoot: true
+      allowPrivilegeEscalation: false 
+      runAsNonRoot: true               
     seccompProfile:
-      type: RuntimeDefault
+      type: RuntimeDefault             
+    containers:
+      - name: '*'
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL                     
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
   params:
     - name: revision
       value: "main"
