@@ -74,13 +74,14 @@ tolerations: []
 affinity: {}
 
 service:
-  type: ClusterIP
+  type: "ClusterIP"
+  name: "influxdb2"  
+  portName: "http-influxdb2"
   port: 8086
   targetPort: 8086
+  labels:
+    app: "influxdb2"
   annotations: {}
-  labels: 
-    app: influxdb2
-  portName: http-influxdb2
 
 
 
