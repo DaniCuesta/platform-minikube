@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: git-clone-pipeline-run-
+spec:
+  pipelineRef:
+    name: git-clone-pipeline
+  params:
+    - name: revision
+      value: "develop"  # Ajusta esto a la rama que desees
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
