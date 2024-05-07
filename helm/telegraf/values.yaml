@@ -44,11 +44,10 @@ volumes:
 # Configuraciones de RBAC
 rbac:
   create: true
-  clusterWide: false
-  rules:
-    - apiGroups: [""]
-      resources: ["pods", "configmaps"]
-      verbs: ["get", "list", "watch"]
+  clusterRole:
+    name: influx:telegraf
+  clusterRoleBinding:
+    name: influx:telegraf:viewer
 
 # Configuración de PodDisruptionBudget
 pdb:
