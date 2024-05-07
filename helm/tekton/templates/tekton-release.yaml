@@ -2648,7 +2648,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: tekton-pipelines-resolvers-namespace-rbac
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2682,7 +2682,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tekton-pipelines-resolvers
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2714,7 +2714,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: tekton-pipelines-resolvers
-    namespace: cicd-resolvers
+    namespace: cicd
 roleRef:
   kind: ClusterRole
   name: tekton-pipelines-resolvers-resolution-request-updates
@@ -2739,7 +2739,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: tekton-pipelines-resolvers-namespace-rbac
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2747,7 +2747,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: tekton-pipelines-resolvers
-    namespace: cicd-resolvers
+    namespace: cicd
 roleRef:
   kind: Role
   name: tekton-pipelines-resolvers-namespace-rbac
@@ -2772,7 +2772,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: bundleresolver-config
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2800,7 +2800,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cluster-resolver-config
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2834,7 +2834,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: resolvers-feature-flags
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2868,7 +2868,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-leader-election-resolvers
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2923,7 +2923,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-logging
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -2977,7 +2977,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-observability
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -3040,7 +3040,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: git-resolver-config
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -3085,7 +3085,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: http-resolver-config
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -3113,7 +3113,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: hubresolver-config
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
@@ -3148,7 +3148,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tekton-pipelines-remote-resolvers
-  namespace: cicd-resolvers
+  namespace: cicd
   labels:
     app.kubernetes.io/name: resolvers
     app.kubernetes.io/component: resolvers
@@ -3276,7 +3276,7 @@ metadata:
     app: tekton-pipelines-remote-resolvers
     version: "v0.59.0"
   name: tekton-pipelines-remote-resolvers
-  namespace: cicd-resolvers
+  namespace: cicd
 spec:
   ports:
     - name: http-metrics
