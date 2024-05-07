@@ -1,0 +1,5 @@
+apiVersion: v2
+name: sonatype-nexus
+description: "A Helm chart for deploying Sonatype Nexus Repository Manager"
+version: 1.0.0
+appVersion: "3.30.0"  # Versión de Nexus que deseas desplegar
