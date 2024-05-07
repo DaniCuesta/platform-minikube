@@ -10,7 +10,8 @@ spec:
     - name: revision
       value: "main"  # Ajusta esto a la rama que desees
   workspaces:
-    - name: shared-workspace
+    - name: output
+      workspace: shared-workspace
       volumeClaimTemplate:
         spec:
           accessModes:
