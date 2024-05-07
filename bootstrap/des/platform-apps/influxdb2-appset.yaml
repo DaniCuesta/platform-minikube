@@ -1,34 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  name: influxdb2-appset
+  name: influxdb2-des
   namespace: minikube-gitops
 spec:
-  generators:
-    - list:
-        elements:
-          - cluster: des
-            url: https://kubernetes.default.svc
-            repoURL: 'git@github.com:DaniCuesta/platform-minikube.git'
-            targetNamespace: monitoring
-            appName: influxdb2
-            project: default
-  template:
-    metadata:
-      name: '{{appName}}-{{cluster}}'
-    spec:
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-      project: '{{project}}'
-      source:
-        repoURL: '{{repoURL}}'
-        targetRevision: HEAD
-        path: 'helm/{{appName}}/'
-        helm:
-          valueFiles:
-            - values-{{cluster}}.yaml
-      destination:
-        namespace: '{{targetNamespace}}'
-        server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    repoURL: git@github.com:DaniCuesta/platform-minikube.git
+    targetRevision: HEAD
+    path: helm/influxdb2/
+    helm:
+      valueFiles:
+        - values-des.yaml
+  destination:
+    namespace: monitoring
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
