@@ -6,9 +6,15 @@ metadata:
 spec:
   pipelineRef:
     name: git-clone-pipeline
+  podTemplate:
+    securityContext:
+      runAsNonRoot: true
+      allowPrivilegeEscalation: false
+    seccompProfile:
+      type: RuntimeDefault
   params:
     - name: revision
-      value: "main"  
+      value: "main"
   workspaces:
     - name: shared-workspace
       volumeClaimTemplate:
