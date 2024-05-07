@@ -8,9 +8,9 @@ spec:
     name: git-clone-pipeline
   params:
     - name: revision
-      value: "main"
+      value: "main"  
   workspaces:
-    - name: output
+    - name: shared-workspace
       volumeClaimTemplate:
         spec:
           accessModes:
@@ -18,5 +18,6 @@ spec:
           resources:
             requests:
               storage: 1Gi
+
 
 
