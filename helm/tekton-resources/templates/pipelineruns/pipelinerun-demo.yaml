@@ -8,8 +8,8 @@ spec:
     name: git-clone-pipeline
   podTemplate:
     securityContext:
-      runAsNonRoot: true
       allowPrivilegeEscalation: false
+      runAsNonRoot: true
     seccompProfile:
       type: RuntimeDefault
   params:
@@ -24,6 +24,7 @@ spec:
           resources:
             requests:
               storage: 1Gi
+
 
 
 
