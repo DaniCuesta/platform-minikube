@@ -13,8 +13,11 @@ selectorLabels:
             name: "telegraf"
             instance: "telegraf-instance"
 
-# Configuración del Service Account
-serviceAccountName: "telegraf-service-account"
+serviceAccount:
+  name: telegraf-service-account
+  labels:
+    app.kubernetes.io/name: telegraf
+    app.kubernetes.io/instance: telegraf-instance
 
 # Configuración de ConfigMap
 configMapName: "telegraf-config-map"
