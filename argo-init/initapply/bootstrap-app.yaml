@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-middleware
+  namespace: minikube-gitops
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:DaniCuesta/platform-minikube.git
+    targetRevision: HEAD   
+    path: initapply   
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default  
+  syncPolicy:
+    automated:
+      prune: false   
