@@ -39,3 +39,11 @@ spec:
             $(params.repo-url) $(workspaces.output.path)
         cd $(workspaces.output.path)
         git checkout $(params.revision)
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
