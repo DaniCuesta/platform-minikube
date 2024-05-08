@@ -13,9 +13,24 @@ spec:
       labels:
         app: postgresql
     spec:
+      serviceAccountName: postgresql-sa
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+      - name: init-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 999:999 /home/postgres/pgdata"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: false
+          runAsUser: 0  # Ejecuta el init container como root
+        volumeMounts:
+        - name: postgresql-storage
+          mountPath: /home/postgres/pgdata
       containers:
       - name: postgresql
         image: docker.io/postgres:12.18
@@ -28,7 +43,7 @@ spec:
           value: "1234"
         - name: POSTGRES_DB
           value: "sonar"
-        - name: PGDATA  # Usar una ruta alternativa para evitar permisos de root
+        - name: PGDATA
           value: "/home/postgres/pgdata"
         volumeMounts:
         - name: postgresql-storage
