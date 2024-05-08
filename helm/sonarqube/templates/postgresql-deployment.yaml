@@ -19,15 +19,15 @@ spec:
           type: RuntimeDefault
       initContainers:
       - name: init-permissions
-        image: docker.io/busybox:latest
+        image: busybox:latest
         command: ["sh", "-c", "mkdir -p /home/postgres/pgdata && chown -R 999:999 /home/postgres/pgdata"]
         securityContext:
-          allowPrivilegeEscalation: false
+          allowPrivilegeEscalation: true  # Permitir elevación de privilegios
           capabilities:
             drop:
               - ALL
-          runAsNonRoot: true
-          runAsUser: 999  # UID del usuario postgres
+          runAsNonRoot: false
+          runAsUser: 0  # Ejecutar como root
           seccompProfile:
             type: RuntimeDefault
         volumeMounts:
@@ -55,7 +55,7 @@ spec:
           capabilities:
             drop:
               - ALL
-          runAsNonRoot: true  # Asegura que no se ejecute como root
+          runAsNonRoot: true
           runAsUser: 999  # UID del usuario postgres en el contenedor
           seccompProfile:
             type: RuntimeDefault
