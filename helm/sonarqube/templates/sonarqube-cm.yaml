@@ -9,4 +9,4 @@ data:
   SONARQUBE_JDBC_URL: "jdbc:postgresql://postgres:5432/sonar_db"
   SONARQUBE_JDBC_USERNAME: "admin"
   SONARQUBE_JDBC_PASSWORD: "1234"
-  JAVA_OPTS: "-Duser.timezone=Asia/Jakarta -Xmx2048m"
+  ES_JAVA_OPTS: "-Duser.timezone=Asia/Jakarta -Xmx2048m"
