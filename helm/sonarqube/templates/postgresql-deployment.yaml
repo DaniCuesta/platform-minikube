@@ -13,7 +13,6 @@ spec:
       labels:
         app: postgresql
     spec:
-      serviceAccountName: postgresql-sa
       securityContext:
         seccompProfile:
           type: RuntimeDefault
