@@ -13,9 +13,12 @@ spec:
       labels:
         app: sonarqube
     spec:
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
+      initContainers:
+      - name: sysctl
+        image: busybox:latest
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
       containers:
       - name: sonarqube
         image: sonarqube:latest
@@ -31,17 +34,9 @@ spec:
         volumeMounts:
         - name: sonarqube-data
           mountPath: /opt/sonarqube/data
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true
-          runAsUser: 1000  # UID del usuario no root
-          seccompProfile:
-            type: RuntimeDefault
       volumes:
       - name: sonarqube-data
         persistentVolumeClaim:
           claimName: sonarqube-pvc
+
 
