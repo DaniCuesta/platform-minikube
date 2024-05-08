@@ -29,11 +29,12 @@ spec:
           volumeMounts:
             - name: registry-vol
               mountPath: /nexus-data
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true
-          runAsUser: 1000  # UID del usuario no root
-          seccompProfi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000  # UID del usuario no root
+            seccompProfile:
+              type: RuntimeDefault
