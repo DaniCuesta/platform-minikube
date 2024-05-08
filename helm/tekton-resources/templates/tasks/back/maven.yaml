@@ -55,6 +55,11 @@ spec:
         # mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
 
         mvn clean package -P $(params.profile) -Dmaven.test.skip=true
+        # Move to the output workspace and copy .jar files from the target directory
         cd $(workspaces.output.path)
-        ls 
+        cp $(workspaces.source.path)/target/*.jar .
+
+        # List the contents for verification
+        ls
+        
         
