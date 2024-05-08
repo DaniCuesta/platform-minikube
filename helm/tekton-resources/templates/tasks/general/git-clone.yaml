@@ -186,12 +186,12 @@ spec:
         echo "${GIT_SSH_KEY}" > "${SSH_DIR}/id_rsa"
         chmod 600 "${SSH_DIR}/id_rsa"
 
-        # Añade github.com a la lista de hosts conocidos
-        ssh-keyscan github.com > "${SSH_DIR}/known_hosts"
+        # Añade github.com a la lista de hosts conocidos, suprimiendo logs
+        ssh-keyscan github.com > "${SSH_DIR}/known_hosts" 2>/dev/null
         chmod 644 "${SSH_DIR}/known_hosts"
 
         # Define el comando SSH para usar la clave específica y los hosts conocidos
-        export GIT_SSH_COMMAND="ssh -i ${SSH_DIR}/id_rsa -o UserKnownHostsFile=${SSH_DIR}/known_hosts"
+        export GIT_SSH_COMMAND="ssh -i ${SSH_DIR}/id_rsa -o UserKnownHostsFile=${SSH_DIR}/known_hosts -o LogLevel=ERROR"
 
         # Define el directorio donde se clonará el repositorio
         REPO_DIR="$(workspaces.output.path)"
@@ -201,7 +201,7 @@ spec:
         REPO_URL="$(params.url)"
         REPO_BRANCH="$(params.revision)"
 
-        # Clona el repositorio en el directorio especificado, usando la rama deseada
-        git clone -b "${REPO_BRANCH}" "${REPO_URL}" "${REPO_DIR}"
+        # Clona el repositorio en el directorio especificado, usando la rama deseada y suprimiendo logs
+        git clone -b "${REPO_BRANCH}" "${REPO_URL}" "${REPO_DIR}" >/dev/null 2>&1
 
         ls $(workspaces.output.path)/demo-app-labo
