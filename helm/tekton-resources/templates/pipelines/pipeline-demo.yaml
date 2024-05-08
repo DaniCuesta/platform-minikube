@@ -4,6 +4,8 @@ metadata:
   name: git-clone-pipeline
 spec:
   params:
+    - name: url
+      type: string
     - name: revision
       type: string
       description: La rama o etiqueta a la que se debe hacer checkout.
@@ -16,7 +18,7 @@ spec:
       taskRef:
         name: git-clone
       params:
-        - name: repo-url
+        - name: url
           value: git@github.com:DaniCuesta/demo-app-labo.git
         - name: revision
           value: $(params.revision)
