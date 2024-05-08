@@ -30,7 +30,7 @@ spec:
         - name: POSTGRES_DB
           value: "sonar"
         volumeMounts:
-        - name: postgres-volume-mount
+        - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
           subPath: postgres
         securityContext:
