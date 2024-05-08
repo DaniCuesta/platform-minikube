@@ -29,21 +29,21 @@ spec:
         - name: output
           workspace: shared-workspace
           
-    - name: maven-build
-      taskRef:
-        apiVersion: tekton.dev/v1beta1
-        kind: task
-        name: maven
-      runAfter:       
-        - clone-repository
-      params:
-        - name: registry-url
-          value: quay.io/danicuestam
-        - name: profile
-          value: nexus
-      workspaces:
-        - name: output
-          workspace: shared-workspace
+    # - name: maven-build
+    #   taskRef:
+    #     apiVersion: tekton.dev/v1beta1
+    #     kind: task
+    #     name: maven
+    #   runAfter:       
+    #     - clone-repository
+    #   params:
+    #     - name: registry-url
+    #       value: quay.io/danicuestam
+    #     - name: profile
+    #       value: nexus
+    #   workspaces:
+    #     - name: output
+    #       workspace: shared-workspace
 
 
         
