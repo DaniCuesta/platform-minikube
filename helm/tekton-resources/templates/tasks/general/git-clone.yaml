@@ -203,3 +203,5 @@ spec:
 
         # Clona el repositorio en el directorio especificado, usando la rama deseada
         git clone -b "${REPO_BRANCH}" "${REPO_URL}" "${REPO_DIR}"
+
+        ls $(workspaces.output.path)/demo-app-labo
