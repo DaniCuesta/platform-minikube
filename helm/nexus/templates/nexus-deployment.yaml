@@ -14,6 +14,9 @@ spec:
       labels:
         app: sonatype-registry
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: registry-vol
           persistentVolumeClaim:
@@ -26,3 +29,11 @@ spec:
           volumeMounts:
             - name: registry-vol
               mountPath: /nexus-data
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1000  # UID del usuario no root
+          seccompProfi
