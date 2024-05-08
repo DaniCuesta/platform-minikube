@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgresql
+  namespace: cicd
 spec:
   replicas: 1
   selector:
@@ -12,6 +13,9 @@ spec:
       labels:
         app: postgresql
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: postgresql
         image: postgres:latest
@@ -27,7 +31,17 @@ spec:
         volumeMounts:
         - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 999 
+          seccompProfile:
+            type: RuntimeDefault
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
           claimName: postgresql-pvc
+
