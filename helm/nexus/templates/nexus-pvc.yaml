@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: sonatype-registry-data
+name: sonatype-registry-data
+namespace: cicd
 spec:
-  storageClassName: standard
-  accessModes:
-    - ReadWriteOnce
-  resources:
+storageClassName: sonatypestorage
+accessModes:
+- ReadWriteOnce
+resources:
     requests:
-      storage: 10Gi
+    storage: 10Gi
