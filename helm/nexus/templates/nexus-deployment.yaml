@@ -19,12 +19,18 @@ spec:
           persistentVolumeClaim:
             claimName: sonatype-registry-data
       containers:
-        - image: docker.io/sonatype/nexus3:latest
-          name: nexus
+        - name: nexus
+          image: docker.io/sonatype/nexus3:latest
           ports:
             - containerPort: 8081
           volumeMounts:
             - name: registry-vol
               mountPath: /nexus-data
+          env:
+            - name: NEXUS_CONTEXT
+              value: /
+            - name: JAVA_OPTS
+              value: "-Dcom.sun.net.ssl.checkRevocation=false -Dcom.sun.security.enableCRLDP=false"
+
       
 
