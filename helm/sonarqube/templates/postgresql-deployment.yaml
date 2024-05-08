@@ -21,7 +21,12 @@ spec:
         image: docker.io/busybox:1.36.1
         command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
         securityContext:
-          runAsUser: 0
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 999
         volumeMounts:
         - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
@@ -53,5 +58,7 @@ spec:
       - name: postgresql-storage
         persistentVolumeClaim:
           claimName: postgresql-pvc
+
+
 
 
