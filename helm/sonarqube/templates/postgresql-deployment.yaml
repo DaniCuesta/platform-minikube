@@ -13,24 +13,35 @@ spec:
       labels:
         app: postgresql
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: postgresql
-        image: postgres:latest
+        image: docker.io/postgres:12.18
         ports:
         - containerPort: 5432
         env:
         - name: POSTGRES_USER
-          value: "sonar"
+          value: "admin"
         - name: POSTGRES_PASSWORD
-          value: "sonar_password"
+          value: "1234"
         - name: POSTGRES_DB
           value: "sonar"
+        - name: PGDATA  # Usar una ruta alternativa para evitar permisos de root
+          value: "/home/postgres/pgdata"
         volumeMounts:
         - name: postgresql-storage
-          mountPath: /var/lib/postgresql/data
+          mountPath: /home/postgres/pgdata
         securityContext:
           allowPrivilegeEscalation: false
-          runAsUser: 0  # Ejecuta el contenedor como el usuario root
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 999  # UID del usuario postgres en el contenedor
+          seccompProfile:
+            type: RuntimeDefault
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
