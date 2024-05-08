@@ -17,22 +17,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-      - name: init-permissions
-        image: busybox:latest
-        command: ["sh", "-c", "mkdir -p /home/postgres/pgdata && chown -R 999:999 /home/postgres/pgdata"]
-        securityContext:
-          allowPrivilegeEscalation: true  # Permitir elevación de privilegios
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: false
-          runAsUser: 0  # Ejecutar como root
-          seccompProfile:
-            type: RuntimeDefault
-        volumeMounts:
-        - name: postgresql-storage
-          mountPath: /home/postgres/pgdata
       containers:
       - name: postgresql
         image: docker.io/postgres:12.18
@@ -46,23 +30,24 @@ spec:
         - name: POSTGRES_DB
           value: "sonar"
         - name: PGDATA
-          value: "/home/postgres/pgdata"
+          value: "/var/lib/postgresql/data"
         volumeMounts:
         - name: postgresql-storage
-          mountPath: /home/postgres/pgdata
+          mountPath: /var/lib/postgresql/data
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - ALL
-          runAsNonRoot: true
-          runAsUser: 999  # UID del usuario postgres en el contenedor
+          runAsNonRoot: true  # Ejecutar siempre como no-root
+          runAsUser: 999  # UID del usuario postgres
           seccompProfile:
             type: RuntimeDefault
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
           claimName: postgresql-pvc
+
 
 
 
