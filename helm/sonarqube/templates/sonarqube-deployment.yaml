@@ -33,9 +33,27 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9000
-        envFrom:
-        - configMapRef:
-            name: sonar-config
+        env:
+          - name: SONARQUBE_JDBC_URL
+            valueFrom:
+              configMapKeyRef:
+                name: sonar-config
+                key: SONARQUBE_JDBC_URL
+          - name: SONARQUBE_JDBC_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: sonar-config
+                key: SONARQUBE_JDBC_USERNAME
+          - name: SONARQUBE_JDBC_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: sonar-config
+                key: SONARQUBE_JDBC_PASSWORD
+          - name: ES_JAVA_OPTS
+            valueFrom:
+              configMapKeyRef:
+                name: sonar-config
+                key: ES_JAVA_OPTS
         volumeMounts:
         - name: app-pvc
           mountPath: "/opt/sonarqube/data/"
