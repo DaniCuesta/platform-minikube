@@ -26,11 +26,10 @@ spec:
       workspaces:
         - name: output
           workspace: shared-workspace
+          
     - name: maven-build
       taskRef:
         name: maven
-        kind: Task
-        apiVersion: tekton.dev/v1beta1
       runAfter:       
         - clone-repository
       params:
