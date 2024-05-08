@@ -16,20 +16,6 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-      - name: init-permissions
-        image: docker.io/busybox:1.36.1
-        command: ["sh", "-c", "chown -R 999:999 /var/lib/postgresql/data"]
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true
-          runAsUser: 999
-        volumeMounts:
-        - name: postgresql-storage
-          mountPath: /var/lib/postgresql/data
       containers:
       - name: postgresql
         image: postgres:latest
@@ -42,9 +28,11 @@ spec:
           value: "sonar_password"
         - name: POSTGRES_DB
           value: "sonar"
+        - name: PGDATA  # Establece el directorio de datos de PostgreSQL
+          value: "/home/postgres/pgdata"
         volumeMounts:
         - name: postgresql-storage
-          mountPath: /var/lib/postgresql/data
+          mountPath: /home/postgres/pgdata
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
