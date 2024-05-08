@@ -55,6 +55,6 @@ spec:
         # mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
 
         mvn clean package -P $(params.profile) -Dmaven.test.skip=true
-        cd $(workspaces.workspace.path)
+        cd $(workspaces.output.path)
         ls 
         
