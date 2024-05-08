@@ -17,8 +17,6 @@ spec:
   tasks:
     - name: clone-repository
       taskRef:
-        apiVersion: tekton.dev/v1beta1
-        kind: task
         name: git-clone
       params:
         - name: url
@@ -31,8 +29,6 @@ spec:
           
     # - name: maven-build
     #   taskRef:
-    #     apiVersion: tekton.dev/v1beta1
-    #     kind: task
     #     name: maven
     #   runAfter:       
     #     - clone-repository
@@ -44,6 +40,5 @@ spec:
     #   workspaces:
     #     - name: output
     #       workspace: shared-workspace
-
 
         
