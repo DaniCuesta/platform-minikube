@@ -13,6 +13,9 @@ spec:
       labels:
         app: sonarqube
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: sonarqube
         image: sonarqube:latest
@@ -20,15 +23,25 @@ spec:
         - containerPort: 9000
         env:
         - name: SONARQUBE_JDBC_USERNAME
-          value: "admin"
+          value: "sonar"
         - name: SONARQUBE_JDBC_PASSWORD
-          value: "1234"
+          value: "sonar_password"
         - name: SONARQUBE_JDBC_URL
-          value: "jdbc:postgresql://postgresql:5432/sonar"
+          value: "jdbc:postgresql://postgresql-service:5432/sonar"
         volumeMounts:
-        - name: sonarqube-storage
+        - name: sonarqube-data
           mountPath: /opt/sonarqube/data
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          runAsNonRoot: true
+          runAsUser: 1000  # UID del usuario no root
+          seccompProfile:
+            type: RuntimeDefault
       volumes:
-      - name: sonarqube-storage
+      - name: sonarqube-data
         persistentVolumeClaim:
           claimName: sonarqube-pvc
+
