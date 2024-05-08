@@ -195,6 +195,9 @@ spec:
         # Configurar Git para usar el comando SSH adecuado
         export GIT_SSH_COMMAND="ssh -i ${PARAM_USER_HOME}/id_rsa -o UserKnownHostsFile=${PARAM_USER_HOME}/known_hosts"
 
+        # Define CHECKOUT_DIR for the directory cleanup function
+        CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}/${PARAM_SUBDIRECTORY}"
+
         # Comprobar si se debe eliminar el contenido existente
         cleandir() {
           if [ -d "${CHECKOUT_DIR}" ]; then
@@ -207,7 +210,8 @@ spec:
           fi
         }
 
-        if [ "${PARAM_DELETE_EXISTING}" = "true" ]; then
+        # Check and perform directory cleanup based on a condition
+        if [ "${PARAM_DELETE_EXISTING:-false}" = "true" ]; then
           cleandir || true
         fi
 
