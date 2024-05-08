@@ -17,9 +17,8 @@ spec:
   tasks:
     - name: clone-repository
       taskRef:
+        kind: task
         name: git-clone
-        kind: Task
-        apiVersion: tekton.dev/v1beta1
       params:
         - name: url
           value: git@github.com:DaniCuesta/demo-app-labo.git
@@ -31,9 +30,8 @@ spec:
           
     - name: maven-build
       taskRef:
+        kind: task
         name: maven
-        kind: Task
-        apiVersion: tekton.dev/v1beta1
       runAfter:       
         - clone-repository
       params:
