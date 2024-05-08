@@ -29,11 +29,10 @@ spec:
           value: "1234"
         - name: POSTGRES_DB
           value: "sonar"
-        - name: PGDATA
-          value: "/var/lib/postgresql/data"
         volumeMounts:
-        - name: postgresql-storage
+        - name: postgres-volume-mount
           mountPath: /var/lib/postgresql/data
+          subPath: postgres
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
