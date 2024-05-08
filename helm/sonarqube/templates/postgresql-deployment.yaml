@@ -20,14 +20,16 @@ spec:
       initContainers:
       - name: init-permissions
         image: docker.io/busybox:latest
-        command: ["sh", "-c", "chown -R 999:999 /home/postgres/pgdata"]
+        command: ["sh", "-c", "mkdir -p /home/postgres/pgdata && chown -R 999:999 /home/postgres/pgdata"]
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - ALL
-          runAsNonRoot: false  
-          runAsUser: 0  
+          runAsNonRoot: true
+          runAsUser: 999  # UID del usuario postgres
+          seccompProfile:
+            type: RuntimeDefault
         volumeMounts:
         - name: postgresql-storage
           mountPath: /home/postgres/pgdata
@@ -61,6 +63,7 @@ spec:
       - name: postgresql-storage
         persistentVolumeClaim:
           claimName: postgresql-pvc
+
 
 
 
