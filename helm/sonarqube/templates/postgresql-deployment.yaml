@@ -1,36 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgresql
-  namespace: cicd
+  name: postgres
+  namespace: sonar
+  labels:
+    app: postgres
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgresql
+      app: postgres
   template:
     metadata:
       labels:
-        app: postgresql
+        app: postgres
     spec:
+      securityContext:
+        fsGroup: 2000 
       containers:
-      - name: postgresql
-        image: docker.io/postgres:14-alpine
+      - name: postgress
+        image: docker.io/bitnami/postgresql
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5432
         env:
-        - name: POSTGRES_USER
-          value: "admin"
-        - name: POSTGRES_PASSWORD
-          value: "1234"
-        - name: POSTGRES_DB
-          value: "sonar"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        envFrom:
+        - configMapRef:
+            name: postgres
         volumeMounts:
-        - name: postgresql-storage
-          mountPath: /var/lib/postgresql/data
-          subPath: postgres
+        - name: postgres
+          mountPath: /bitnami/postgresql
       volumes:
-      - name: postgresql-storage
+      - name: postgres
         persistentVolumeClaim:
           claimName: postgresql-pvc
 
