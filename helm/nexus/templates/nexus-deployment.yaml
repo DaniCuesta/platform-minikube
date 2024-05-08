@@ -18,6 +18,9 @@ spec:
         - name: registry-vol
           persistentVolumeClaim:
             claimName: sonatype-registry-data
+        - name: custom-ca-cert-vol
+          secret:
+            secretName: custom-ca-cert
       containers:
         - name: nexus
           image: docker.io/sonatype/nexus3:latest
@@ -26,11 +29,29 @@ spec:
           volumeMounts:
             - name: registry-vol
               mountPath: /nexus-data
+            - name: custom-ca-cert-vol
+              mountPath: /custom-ca
           env:
             - name: NEXUS_CONTEXT
               value: /
-            - name: JAVA_OPTS
-              value: "-Dcom.sun.net.ssl.checkRevocation=false -Dcom.sun.security.enableCRLDP=false"
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - sh
+                  - -c
+                  - |
+                    keytool -import -trustcacerts -file /custom-ca/ca.crt \
+                      -alias custom-ca-cert -keystore $JAVA_HOME/lib/security/cacerts \
+                      -storepass changeit -noprompt
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "1"
+
 
       
 
