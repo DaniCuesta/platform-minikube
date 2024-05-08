@@ -32,7 +32,7 @@ spec:
       description: Harbor repository URL
   steps:
     - name: upload-to-sonar
-      image: $(params.registry-url)/maven-with-helm:latest
+      image: $(params.registry-url)/maven-helm:latest
       imagePullSecrets:
       - name: quay-pull-se
       workingDir: $(workspaces.output.path)
