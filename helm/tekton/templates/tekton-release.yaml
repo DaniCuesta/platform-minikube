@@ -2583,16 +2583,6 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cicd
-  labels:
-    app.kubernetes.io/component: resolvers
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-pipelines
-    pod-security.kubernetes.io/enforce: restricted
-
 ---
 # Copyright 2022 The Tekton Authors
 #

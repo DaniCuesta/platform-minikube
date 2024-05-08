@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: git-clone-pipeline
+  namespace: tekton-tasks
 spec:
   params:
     - name: url
