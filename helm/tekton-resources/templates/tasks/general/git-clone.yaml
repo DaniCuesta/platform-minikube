@@ -178,70 +178,28 @@ spec:
         #!/usr/bin/env sh
         set -eu
 
-        # Directorio alternativo para claves SSH
-        PARAM_USER_HOME="/var/tmp/myssh"
+        # Directorio donde se guardarán las claves SSH
+        SSH_DIR="/var/tmp/myssh"
+        mkdir -p "${SSH_DIR}"
 
-        if [ "${PARAM_VERBOSE}" = "true" ]; then
-          set -x
-        fi
+        # Escribe el contenido de la clave privada almacenada en la variable a un archivo
+        echo "${GIT_SSH_KEY}" > "${SSH_DIR}/id_rsa"
+        chmod 600 "${SSH_DIR}/id_rsa"
 
-        # Configurar el entorno SSH con el contenido del secret
-        mkdir -p "${PARAM_USER_HOME}"
-        echo "${GIT_SSH_KEY}" > "${PARAM_USER_HOME}/id_rsa"
-        chmod 600 "${PARAM_USER_HOME}/id_rsa"
-        ssh-keyscan github.com > "${PARAM_USER_HOME}/known_hosts"
-        chmod 644 "${PARAM_USER_HOME}/known_hosts"
+        # Añade github.com a la lista de hosts conocidos
+        ssh-keyscan github.com > "${SSH_DIR}/known_hosts"
+        chmod 644 "${SSH_DIR}/known_hosts"
 
-        # Configurar Git para usar el comando SSH adecuado
-        export GIT_SSH_COMMAND="ssh -i ${PARAM_USER_HOME}/id_rsa -o UserKnownHostsFile=${PARAM_USER_HOME}/known_hosts"
+        # Define el comando SSH para usar la clave específica y los hosts conocidos
+        export GIT_SSH_COMMAND="ssh -i ${SSH_DIR}/id_rsa -o UserKnownHostsFile=${SSH_DIR}/known_hosts"
 
-        # Define CHECKOUT_DIR for the directory cleanup function
-        CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}/${PARAM_SUBDIRECTORY}"
+        # Define el directorio donde se clonará el repositorio
+        REPO_DIR="$(workspaces.output.path)"
+        mkdir -p "${REPO_DIR}"
 
-        # Comprobar si se debe eliminar el contenido existente
-        cleandir() {
-          if [ -d "${CHECKOUT_DIR}" ]; then
-            # Eliminar archivos no ocultos y directorios
-            rm -rf "${CHECKOUT_DIR:?}"/*
-            # Eliminar archivos ocultos (comenzando con ".") excepto ".."
-            rm -rf "${CHECKOUT_DIR}"/.[!.]*
-            # Eliminar archivos que comiencen con ".." y otro carácter
-            rm -rf "${CHECKOUT_DIR}"/..?*
-          fi
-        }
+        # URL del repositorio y la rama a clonar (proveídas por los parámetros)
+        REPO_URL="$(params.url)"
+        REPO_BRANCH="$(params.revision)"
 
-        # Check and perform directory cleanup based on a condition
-        if [ "${PARAM_DELETE_EXISTING:-false}" = "true" ]; then
-          cleandir || true
-        fi
-
-        # Configurar proxies si están definidos
-        test -z "${PARAM_HTTP_PROXY}" || export HTTP_PROXY="${PARAM_HTTP_PROXY}"
-        test -z "${PARAM_HTTPS_PROXY}" || export HTTPS_PROXY="${PARAM_HTTPS_PROXY}"
-        test -z "${PARAM_NO_PROXY}" || export NO_PROXY="${PARAM_NO_PROXY}"
-
-        # Configurar Git para la clonación
-        git config --global --add safe.directory "${WORKSPACE_OUTPUT_PATH}"
-
-        # Clonar el repositorio con git-init
-        /ko-app/git-init \
-          -url="${PARAM_URL}" \
-          -revision="${PARAM_REVISION}" \
-          -refspec="${PARAM_REFSPEC}" \
-          -path="${CHECKOUT_DIR}" \
-          -sslVerify="${PARAM_SSL_VERIFY}" \
-          -submodules="${PARAM_SUBMODULES}" \
-          -depth="${PARAM_DEPTH}" \
-          -sparseCheckoutDirectories="${PARAM_SPARSE_CHECKOUT_DIRECTORIES}"
-
-        # Obtener información del commit
-        cd "${CHECKOUT_DIR}"
-        RESULT_SHA="$(git rev-parse HEAD)"
-        EXIT_CODE="$?"
-        if [ "${EXIT_CODE}" != 0 ]; then
-          exit "${EXIT_CODE}"
-        fi
-        RESULT_COMMITTER_DATE="$(git log -1 --pretty=%ct)"
-        printf "%s" "${RESULT_COMMITTER_DATE}" > "$(results.committer-date.path)"
-        printf "%s" "${RESULT_SHA}" > "$(results.commit.path)"
-        printf "%s" "${PARAM_URL}" > "$(results.url.path)"
+        # Clona el repositorio en el directorio especificado, usando la rama deseada
+        git clone -b "${REPO_BRANCH}" "${REPO_URL}" "${REPO_DIR}"
