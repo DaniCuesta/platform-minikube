@@ -27,18 +27,18 @@ spec:
         - name: output
           workspace: shared-workspace
           
-    # - name: maven-build
-    #   taskRef:
-    #     name: maven
-    #   runAfter:       
-    #     - clone-repository
-    #   params:
-    #     - name: registry-url
-    #       value: quay.io/danicuestam
-    #     - name: profile
-    #       value: nexus
-    #   workspaces:
-    #     - name: output
-    #       workspace: shared-workspace
+    - name: maven-build
+      taskRef:
+        name: maven
+      runAfter:       
+        - clone-repository
+      params:
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: profile
+          value: nexus
+      workspaces:
+        - name: output
+          workspace: shared-workspace
 
         
