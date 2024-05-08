@@ -178,22 +178,22 @@ spec:
         #!/usr/bin/env sh
         set -eu
 
-        # Directorio Home del Usuario
-        PARAM_USER_HOME="$HOME"
+        # Directorio alternativo para claves SSH
+        PARAM_USER_HOME="/var/tmp/myssh"
 
         if [ "${PARAM_VERBOSE}" = "true" ]; then
           set -x
         fi
 
         # Configurar el entorno SSH con el contenido del secret
-        mkdir -p "${PARAM_USER_HOME}/.ssh"
-        echo "${GIT_SSH_KEY}" > "${PARAM_USER_HOME}/.ssh/id_rsa"
-        chmod 600 "${PARAM_USER_HOME}/.ssh/id_rsa"
-        ssh-keyscan github.com > "${PARAM_USER_HOME}/.ssh/known_hosts"
-        chmod 644 "${PARAM_USER_HOME}/.ssh/known_hosts"
+        mkdir -p "${PARAM_USER_HOME}"
+        echo "${GIT_SSH_KEY}" > "${PARAM_USER_HOME}/id_rsa"
+        chmod 600 "${PARAM_USER_HOME}/id_rsa"
+        ssh-keyscan github.com > "${PARAM_USER_HOME}/known_hosts"
+        chmod 644 "${PARAM_USER_HOME}/known_hosts"
 
         # Configurar Git para usar el comando SSH adecuado
-        export GIT_SSH_COMMAND="ssh -i ${PARAM_USER_HOME}/.ssh/id_rsa -o UserKnownHostsFile=${PARAM_USER_HOME}/.ssh/known_hosts"
+        export GIT_SSH_COMMAND="ssh -i ${PARAM_USER_HOME}/id_rsa -o UserKnownHostsFile=${PARAM_USER_HOME}/known_hosts"
 
         # Comprobar si se debe eliminar el contenido existente
         cleandir() {
