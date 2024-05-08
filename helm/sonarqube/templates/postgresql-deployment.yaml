@@ -13,7 +13,7 @@ spec:
       labels:
         app: postgresql
     spec:
-      serviceAccountName: postgresql-sa  # Asignar el S
+      serviceAccountName: postgresql-sa  # Asignar el ServiceAccount al Deployment
       containers:
       - name: postgresql
         image: postgres:latest
@@ -29,15 +29,6 @@ spec:
         volumeMounts:
         - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true
-          runAsUser: 999  # UID del usuario postgres en el contenedor
-          seccompProfile:
-            type: RuntimeDefault
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
