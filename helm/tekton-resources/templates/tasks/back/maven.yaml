@@ -51,7 +51,8 @@ spec:
 
         # Las variables de entorno NEXUS_USER, NEXUS_PASSWORD y NEXUS_URL son seteadas automáticamente
         # Base deployment repository se construye usando NEXUS_URL
-        baseDeploymentRepository=snapshots::default::http://${NEXUS_USER}:${NEXUS_PASSWORD}@${NEXUS_URL}/repository/maven-snapshots
-        
-        mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
+        # baseDeploymentRepository=snapshots::default::http://${NEXUS_USER}:${NEXUS_PASSWORD}@${NEXUS_URL}/repository/maven-snapshots
+        # mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
 
+        mvn clean package -P $(params.profile) -Dmaven.test.skip=true
+        cp $(workspaces.workspace.path)/repo/target/*.jar $(workspaces.workspace.path)/
