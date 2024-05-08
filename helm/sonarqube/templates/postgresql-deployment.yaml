@@ -13,10 +13,6 @@ spec:
       labels:
         app: postgresql
     spec:
-      serviceAccountName: postgresql-sa  # Asigna el ServiceAccount
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
       containers:
       - name: postgresql
         image: postgres:latest
@@ -24,9 +20,9 @@ spec:
         - containerPort: 5432
         env:
         - name: POSTGRES_USER
-          value: "admin"
+          value: "sonar"
         - name: POSTGRES_PASSWORD
-          value: "1234"
+          value: "sonar_password"
         - name: POSTGRES_DB
           value: "sonar"
         volumeMounts:
@@ -34,17 +30,12 @@ spec:
           mountPath: /var/lib/postgresql/data
         securityContext:
           allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true
-          runAsUser: 999  # UID del usuario postgres en el contenedor
-          seccompProfile:
-            type: RuntimeDefault
+          runAsUser: 0  # Ejecuta el contenedor como el usuario root
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
           claimName: postgresql-pvc
+
 
 
 
