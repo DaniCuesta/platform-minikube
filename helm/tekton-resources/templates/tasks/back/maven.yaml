@@ -53,5 +53,5 @@ spec:
         # Base deployment repository se construye usando NEXUS_URL
         baseDeploymentRepository=snapshots::default::http://${NEXUS_USER}:${NEXUS_PASSWORD}@${NEXUS_URL}/repository/maven-snapshots
         
-        /usr/bin/mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
+        mvn clean deploy -P $(params.profile) -Dmaven.test.skip=true -DaltDeploymentRepository=${baseDeploymentRepository}
 
