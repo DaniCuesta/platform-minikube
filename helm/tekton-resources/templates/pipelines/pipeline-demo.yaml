@@ -20,23 +20,35 @@ spec:
         name: git-clone
       params:
         - name: url
-          value: git@github.com:DaniCuesta/demo-app-labo.git
+          value: $(params.url)
         - name: revision
           value: $(params.revision)
       workspaces:
         - name: output
           workspace: shared-workspace
-          
+
     - name: maven-build
       taskRef:
         name: maven
-      runAfter:       
+      runAfter:
         - clone-repository
       params:
         - name: registry-url
-          value: quay.io/danicuestam
+          value: $(params.registry-url)
         - name: profile
           value: nexus
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: maven-upload-sonar
+      taskRef:
+        name: maven-upload-sonar
+      runAfter:
+        - maven-build
+      params:
+        - name: registry-url
+          value: quay.io/danicuestam
       workspaces:
         - name: output
           workspace: shared-workspace

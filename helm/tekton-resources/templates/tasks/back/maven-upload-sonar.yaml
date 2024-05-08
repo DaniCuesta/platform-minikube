@@ -1,0 +1,61 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: maven-upload-sonar
+  namespace: tekton-tasks
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: Build Tools
+    tekton.dev/tags: build-tool
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This Task uploads a Maven project to Sonar for analysis using the provided Maven image.
+
+    Parameters:
+
+    - `registry-url`: (type: string) The URL of the Harbor repository containing the Maven image with Helm integration.
+    - `sonar-credentials-secret`: (type: string) Name of the Kubernetes Secret containing the Sonar login credentials.
+
+    Workspaces:
+
+    - `output`: The workspace containing the Maven project to be uploaded to Sonar for analysis.
+
+  workspaces:
+    - name: output
+      description: The workspace consisting of the Maven project.
+  params:
+    - name: registry-url
+      type: string
+      description: Harbor repository URL
+  steps:
+    - name: upload-to-sonar
+      image: $(params.registry-url)/maven-with-helm:latest
+      workingDir: $(workspaces.output.path)
+      env:
+        - name: SONAR_HOST_URL
+          valueFrom:
+            secretKeyRef:
+              name: sonar-credentials
+              key: url
+        - name: SONAR_LOGIN
+          valueFrom:
+            secretKeyRef:
+              name: sonar-credentials
+              key: login
+      script: |
+        #!/bin/bash
+        set -e
+
+        # Verificar que las variables estén disponibles
+        if [[ -z "${SONAR_HOST_URL}" || -z "${SONAR_LOGIN}" ]]; then
+          echo "Error: Falta información de Sonar."
+          exit 1
+        fi
+
+        # Subir el proyecto a Sonar utilizando Maven
+        echo "Uploading project to Sonar..."
+        /usr/bin/mvn sonar:sonar -Dsonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_LOGIN}
+
