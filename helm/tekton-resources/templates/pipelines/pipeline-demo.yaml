@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: git-clone-pipeline
+  name: pipeline-ejemplo
   namespace: tekton-tasks
 spec:
   params:
@@ -26,6 +26,18 @@ spec:
       workspaces:
         - name: output
           workspace: shared-workspace
-
+    - name: maven-build
+      taskRef:
+        name: maven
+        kind: Task
+        apiVersion: tekton.dev/v1beta1
+      params:
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: profile
+          value: nexus
+      workspaces:
+        - name: output
+          workspace: shared-workspace
 
         

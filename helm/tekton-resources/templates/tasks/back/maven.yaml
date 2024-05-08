@@ -26,7 +26,7 @@ spec:
       default: "nexus"
   steps:
     - name: mvn-goals
-      image: quay.io/danicuestam/maven-helm:latest
+      image: $(params.registry-url)/maven-helm:latest
       imagePullSecrets:
       - name: quay-pull-secret
       env:
