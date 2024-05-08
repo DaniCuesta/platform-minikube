@@ -31,6 +31,8 @@ spec:
         name: maven
         kind: Task
         apiVersion: tekton.dev/v1beta1
+      runAfter:       
+        - clone-repository
       params:
         - name: registry-url
           value: quay.io/danicuestam
