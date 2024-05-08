@@ -1,33 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-name: sonatype-registry
-namespace: cicd
-labels:
+  name: sonatype-registry
+  labels:
     app: sonatype-registry
 spec:
-replicas: 1
-selector:
+  replicas: 1
+  selector:
     matchLabels:
-    app: sonatype-registry
-template:
+      app: sonatype-registry
+  template:
     metadata:
-    labels:
+      labels:
         app: sonatype-registry
     spec:
-    volumes:
-    - name: registry-vol
+      volumes:
+      - name: registry-vol
         persistentVolumeClaim:
-        claimName: sonatype-registry-data
-    containers:
-    - image: docker.io/sonatype/nexus3
-    name: nexus
-    ports:
+          claimName: sonatype-registry-data
+      containers:
+      - image: docker.io/sonatype/nexus3
+        name: nexus
+        ports:
         - containerPort: 8081
-    volumeMounts:
-    - name: registry-vol
-        mountPath: /nexus-data
-        subPath: sonatype
+        volumeMounts:
+        - name: registry-vol
+          mountPath: /nexus-data
+          subPath: sonatype
 
 
       
