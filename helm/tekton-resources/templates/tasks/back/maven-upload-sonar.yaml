@@ -33,6 +33,8 @@ spec:
   steps:
     - name: upload-to-sonar
       image: $(params.registry-url)/maven-with-helm:latest
+      imagePullSecrets:
+      - name: quay-pull-se
       workingDir: $(workspaces.output.path)
       env:
         - name: SONAR_HOST_URL

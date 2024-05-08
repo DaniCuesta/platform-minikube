@@ -34,7 +34,7 @@ spec:
         - clone-repository
       params:
         - name: registry-url
-          value: $(params.registry-url)
+          value: quay.io/danicuestam
         - name: profile
           value: nexus
       workspaces:
