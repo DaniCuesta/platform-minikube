@@ -31,6 +31,15 @@ spec:
           value: "1234"
         - name: SONARQUBE_JDBC_URL
           value: "jdbc:postgresql://postgresql-service:5432/sonar"
+        - name: SONAR_SEARCH_JAVAOPTS
+          value: "-Xmx2g -Xms2g"
+        resources:
+          requests:
+            memory: "3Gi"
+            cpu: "1"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
         volumeMounts:
         - name: sonarqube-data
           mountPath: /opt/sonarqube/data
@@ -38,5 +47,6 @@ spec:
       - name: sonarqube-data
         persistentVolumeClaim:
           claimName: sonarqube-pvc
+
 
 
