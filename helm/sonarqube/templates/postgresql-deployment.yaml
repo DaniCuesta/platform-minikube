@@ -13,9 +13,6 @@ spec:
       labels:
         app: postgresql
     spec:
-      securityContext:
-        seccompProfile:
-          type: RuntimeDefault
       containers:
       - name: postgresql
         image: docker.io/postgres:14-alpine
@@ -32,15 +29,6 @@ spec:
         - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
           subPath: postgres
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          runAsNonRoot: true  # Ejecutar siempre como no-root
-          runAsUser: 999  # UID del usuario postgres
-          seccompProfile:
-            type: RuntimeDefault
       volumes:
       - name: postgresql-storage
         persistentVolumeClaim:
