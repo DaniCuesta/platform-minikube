@@ -82,124 +82,236 @@ steps:
           secretKeyRef:
             name: influxdb-token
             key: token
-    script: |
-      
-      echo "import requests
-      import sys
-      import influxdb_client
-      from influxdb_client import InfluxDBClient, Point
-      from influxdb_client.client.write_api import SYNCHRONOUS
+      script: |
 
-      class SonarQube:
-          def __init__(self, url_base, token):
-              self.auth = (token, '')
-              self.URL_BASE = url_base
+        # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
+        # This script is provided in its entirety by the security team.
+        # Except for the assignment of the parameters in def main()
 
-          def _get(self, endpoint, params=None):
-              url = f'{self.URL_BASE}{endpoint}'
-              response = requests.get(url, auth=self.auth, params=params, verify=False)
-              if response.status_code != 200:
-                  raise Exception(f'Error in API request: {response.status_code} {response.text}')
-              return response.json()
+        echo "import requests
+        import sys
+        import influxdb_client, os, time
+        from influxdb_client import InfluxDBClient, Point
+        from influxdb_client.client.write_api import SYNCHRONOUS
 
-          def get_project_key_by_name(self, project_name):
-              response = self._get('/api/projects/search')
-              for component in response.get('components', []):
-                  if component['name'] == project_name:
-                      return component['key']
-              raise ValueError(f'Project {project_name} not found')
+        # Define a SonarQube class to interact with the API
+        class SonarQube:
+            def __init__(self, url_base, token):
+                self.auth = (token, '')
+                self.URL_BASE = url_base
 
-          def get_metric(self, project_key, metric):
-              response = self._get('/api/measures/component', {'component': project_key, 'metricKeys': metric})
-              measures = response['component'].get('measures', [])
-              for measure in measures:
-                  if measure['metric'] == metric:
-                      return measure['value']
-              raise ValueError(f'Metric {metric} not found')
+            # Method to get project key by name
+            def getProjectKeyByName(self, project_name):
+                url = self.URL_BASE + '/api/projects/search'
+                response = requests.get(url, auth=self.auth, verify=False)
+                if response.status_code == 200:
+                    for i in response.json('components'):
+                        if i['name'] == project_name:
+                            return i['key']
+                else:
+                    exit(0)
 
-          def get_quality_gate_status(self, project_key):
-              response = self._get('/api/qualitygates/project_status', {'projectKey': project_key})
-              return response['projectStatus']['status']
+            # Method to get code duplication percentage
+            def getCodeDuplication(self, project_key):
+                url = self.URL_BASE + '/api/measures/component'
+                params = {'component': project_key, 'metricKeys': 'duplicated_lines_density'}
+                response = requests.get(url, params=params, auth=self.auth, verify=False)
+                if response.status_code == 200:
+                    duplicity_str = response.json()['component']['measures'][0]['value']
+                    duplicity = float(duplicity_str.replace('%', ''))
+                    return duplicity
+                else:
+                    print('Duplicidad fallida')
+                    exit(0)
 
-          def get_issues(self, project_key):
-              page = 1
-              issues = {'TOTAL': 0, 'INFO': 0, 'MINOR': 0, 'MAJOR': 0, 'CRITICAL': 0, 'BLOCKER': 0}
-              while True:
-                  response = self._get('/api/issues/search', {'componentKeys': project_key, 'p': page})
-                  issues['TOTAL'] += len(response['issues'])
-                  for issue in response['issues']:
-                      issues[issue['severity']] += 1
-                  if issues['TOTAL'] == response['total']:
-                      break
-                  page += 1
-              return issues
+            # Method to get coverage
+            def getCoverage(self, project_key):
+                url = self.URL_BASE + '/api/measures/component'
+                params = {'component': project_key, 'metricKeys': 'coverage'}
+                response = requests.get(url, params=params, auth=self.auth, verify=False)
+                if response.status_code == 200:
+                    coverage_str = response.json()['component']['measures'][0]['value']
+                    coverage = float(coverage_str.replace('%', ''))
+                    return coverage
+                else:
+                    exit(0)
 
-      class InfluxDBReporter:
-          def __init__(self, url, token, bucket, org='DES'):
-              self.client = InfluxDBClient(url=url, token=token, org=org)
-              self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
-              self.bucket = bucket
-              self.org = org
+             # Method to get project status
+            def getProjectStatus(self, project_key):
+                url = self.URL_BASE + '/api/qualitygates/project_status'
+                params = {'projectKey': project_key}
+                response = requests.get(url, params=params, auth=self.auth, verify=False)
+                if response.status_code == 200:
+                    if response.json()['projectStatus']['status'] == 'OK':
+                        return 'OK'
+                    elif response.json()['projectStatus']['status'] == 'NONE':
+                        return 'NONE'
+                    elif response.json()['projectStatus']['status'] == 'WARN':
+                        return 'WARN'
+                    elif response.json()['projectStatus']['status'] == 'ERROR':
+                        return 'ERROR'
+                elif response.status_code == 404:
+                    exit(0)
 
-          def store_sonar_data(self, project, env, project_element, tenant, quality_gate_status, issues, code_duplication, coverage):
-              framework_tag = self._get_framework_tag(project_element)
-              point = Point('sonarqube_metrics')\
-                  .tag('project_tag', project)\
-                  .tag('Environment_tag', env)\
-                  .tag('Framework_tag', framework_tag)\
-                  .tag('Tenant_tag', tenant)\
-                  .tag('Element_tag', project_element)\
-                  .field('quality_gate_status', quality_gate_status)\
-                  .field('blocker', issues['BLOCKER'])\
-                  .field('critical', issues['CRITICAL'])\
-                  .field('major', issues['MAJOR'])\
-                  .field('minor', issues['MINOR'])\
-                  .field('info', issues['INFO'])\
-                  .field('code_duplication', code_duplication)\
-                  .field('coverage', coverage)
-              self.write_api.write(self.bucket, self.org, point)
+            # Method to get issues from the project
+            def getIssuesFromProject(self, project_key):
+                url = self.URL_BASE + '/api/issues/search'
+                manage = False
+                page = 1
+                issues = {'TOTAL': 0, 'INFO': 0, 'MINOR': 0, 'MAJOR': 0, 'CRITICAL': 0, 'BLOCKER': 0}
+                while manage == False:
+                    params = {'componentKeys': project_key, 'p': page}
+                    response = requests.get(url, params=params, auth=self.auth, verify=False)
+                    if response.status_code == 200:
+                        issues['TOTAL'] = issues['TOTAL'] + len(response.json()['issues'])
+                        for i in response.json()['issues']:
+                            issues[i['severity']] = issues[i['severity']] + 1
+                        if issues['TOTAL'] == response.json()['total']:
+                            manage = True
+                        else:
+                            page = page + 1
+                    else:
+                        exit(0)
+                return issues
 
-          def _get_framework_tag(self, project_element):
-              framework_map = {
-                  'back': 'java',
-                  'quarkus': 'quarkus',
-                  'front': 'angular'
-              }
-              return framework_map.get(project_element, 'unknown')
+            # Method to get lines of code for the project
+            def getLinesCode(self, project_key):
+                url = self.URL_BASE + '/api/measures/component'
+                params = {'component': project_key, 'metricKeys': 'ncloc'}
+                response = requests.get(url, params=params, auth=self.auth, verify=False)
+                if response.status_code == 200:
+                    for i in response.json()['component']['measures']:
+                        if i['metric'] == 'ncloc':
+                            return i['value']
+                else:
+                    exit(0)
 
-      def main():
-          URL_BASE = 'http://$(params.sonar-url)'
-          TOKEN = '${LOGIN}'
-          INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
-          project_name = '$(params.deployment-name)'
-          project_key_tenant = '$(params.project-key-tenant)'
-          project_key = '{project_name}' 
+            # Method to determine if project passes high severity condition
+            def getHight(linesofcode, issues):
+                if (linesofcode / 500 >= issues['MAJOR']):
+                    return 1
+                else:
+                    return 0
 
-          influxdb_url = '$(params.influxdb-url)'
-          influxdb_bucket = '$(params.influxdb-bucket)'
-          env = '$(params.env)'
-          project_element = '$(params.project-element)'
+            # Method to determine if project passes low severity condition
+            def getLow(linesofcode, issues):
+                if ((linesofcode / 500) * 100 >= issues['MINOR']):
+                    return 1
+                else:
+                    return 0
 
-          sonarQube = SonarQube(URL_BASE, TOKEN)
-          reporter = InfluxDBReporter(influxdb_url, INFLUXDB_TOKEN, influxdb_bucket)
+            # Method to print results
+            def printResults(self, issues, proyect_key):
+                passCondition(issues, proyect_key)
 
-          print('Getting issues...')
-          issues = sonarQube.get_issues(project_key)
+            # Method to check overall pass condition
+            def passCondition(issues, proyect_key):
+                if (issues['BLOCKER'] | issues['CRITICAL']) != 0:
+                    pass
+                elif (SonarQube.getHight == 0):
+                    pass
+                elif (SonarQube.getLow == 0):
+                    pass
+                else:
+                    pass
 
-          print('Getting Quality Gate status...')
-          quality_gate_status = sonarQube.get_quality_gate_status(project_key)
-          quality_gate_result = '1' if quality_gate_status == 'OK' else '0'
+            # Method to store data in InfluxDB
+            def storeDataInInfluxDB(self, project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage):
+                
+                organization = 'DES'
+                client = influxdb_client.InfluxDBClient(url=influxdb_url, bucket=influxdb_bucket, org=organization, token=INFLUXDB_TOKEN)
 
-          print('Getting code duplication...')
-          code_duplication = sonarQube.get_metric(project_key, 'duplicated_lines_density')
+                # Determinar el valor de Framework_tag en función de project_element
+                if project_element == 'back':
+                    framework_tag = 'java'
+                elif project_element == 'quarkus':
+                    framework_tag = 'quarkus'
+                elif project_element == 'front':
+                    framework_tag = 'angular'
+                else:
+                    framework_tag = 'unknown'
 
-          print('Getting coverage...')
-          coverage = sonarQube.get_metric(project_key, 'coverage')
+                print('+++++++++++++++++++++++++++++++++++++++++++')
+                print('PROJECT INFO:')
+                print('+++++++++++++++++++++++++++++++++++++++++++')
+                print(project)
+                print(env)
+                print(project_element)
+                print(framework_tag)
+                print(project_key_tenant)
+                print('+++++++++++++++++++++++++++++++++++++++++++')
+                
+                write_api = client.write_api(write_options=SYNCHRONOUS)
 
-          print('Storing data into InfluxDB...')
-          reporter.store_sonar_data(project_name, env, project_element, project_key_tenant, quality_gate_result, issues, code_duplication, coverage)
+                # Crear un punto de datos
+                point = (
+                    Point('sonarqube_metrics''')
+                    .tag('project_tag', project)
+                    .tag('Environment_tag', env)
+                    .tag('Framework_tag', framework_tag)
+                    .tag('Tenant_tag', project_key_tenant)
+                    .tag('Element_tag', project_element)
+                    .field('quality_gate_status', quality_gate_result)
+                    .field('blocker', issues['BLOCKER'])
+                    .field('critical', issues['CRITICAL'])
+                    .field('major', issues['MAJOR'])
+                    .field('minor', issues['MINOR'])
+                    .field('info', issues['INFO'])
+                    .field('total', issues['TOTAL'])
+                    .field('code_duplication', code_duplication)
+                    .field('coverage', coverage)
+                )
+                # Write data into influxdb
+                write_api.write(influxdb_bucket, organization, point)
+ 
+        # Main function
+        def main():
+            URL_BASE = 'http://$(params.sonar-url)'
+            TOKEN = '${LOGIN}'
+            project_name = ''
+            INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
+            
+            print('Starting the sonarqube analysist script, getting parameters...')
+            # Get parameter values
+            project = '$(params.deployment-name)' 
+            env = '$(params.env)'
+            project_element = '$(params.project-element)'
+            project_key_tenant = '$(params.project-key-tenant)'
+            influxdb_url = '$(params.influxdb-url)'  
+            influxdb_bucket = '$(params.influxdb-bucket)'
 
-      if __name__ == '__main__':
-          main()" > script_sonar.py
+            # Create an instance of SonarQube class
+            sonarQube = SonarQube(URL_BASE, TOKEN)
 
-      python3 script_sonar.py
+            # Get issues from the project
+            print('Getting issues...')
+            issues = sonarQube.getIssuesFromProject(project_key)
+
+            # Get project status
+            print('Getting Quality Gate status...')
+            quality_gate = sonarQube.getProjectStatus(project_key)
+
+            if quality_gate == 'OK':
+                quality_gate_result = 1
+            else:
+                quality_gate_result = 0
+
+            # Get code duplication percentage
+            print('Getting code duplication...')
+            code_duplication = sonarQube.getCodeDuplication(project_key)
+
+            # Get coverage
+            print('Getting coverage...')
+            coverage = sonarQube.getCoverage(project_key)
+            
+            print('Storing data into influxdb2 bucket...')
+            # Store data in InfluxDB
+            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage)
+            print('+++++++++++++++++++++++++++++++++++++++++++')
+            print('DATA SUCCESSFULLY STORED')
+            print('+++++++++++++++++++++++++++++++++++++++++++')
+
+        # Call the main function
+        main()" > script_sonar.py
+
+        python3 script_sonar.py
