@@ -77,13 +77,13 @@ steps:
           secretKeyRef:
             name: sonar-credentials
             key: token
-      # - name: INFLUXDB_TOKEN
-      #   valueFrom:
-      #     secretKeyRef:
-      #       name: influxdb-report-task-tkn
-      #       key: token
+      - name: INFLUXDB_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: influxdb-token
+            key: token
     script: |
-      INFLUXDB_TKN="UxDdvLxdYdcDwLIEiER7OE"
+      
       echo "import requests
       import sys
       import influxdb_client
@@ -170,7 +170,7 @@ steps:
       def main():
           URL_BASE = 'http://$(params.sonar-url)'
           TOKEN = '${LOGIN}'
-          INFLUXDB_TOKEN = '${INFLUXDB_TKN}'
+          INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
           project_name = '$(params.deployment-name)'
           project_key_tenant = '$(params.project-key-tenant)'
           project_key = '{project_name}' 
