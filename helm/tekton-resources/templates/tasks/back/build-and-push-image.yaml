@@ -31,9 +31,10 @@ spec:
       args:
         - --dockerfile=$(workspaces.output.path)/Dockerfile
         - --context=$(workspaces.output.path)
-        - --destination=https://quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
+        - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
         - --single-snapshot
+        - --reproducible
         - --verbosity=debug
       env:
         - name: "QUAY_CREDENTIALS"
