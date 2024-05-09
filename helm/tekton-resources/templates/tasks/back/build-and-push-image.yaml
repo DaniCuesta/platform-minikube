@@ -25,7 +25,7 @@ spec:
       description: Holds the Dockerfile and application JAR
   steps:
     - name: build-and-push
-      image: gcr.io/kaniko-project/executor:v1.5.1
+      image: gcr.io/kaniko-project/executor:latest
       workingDir: $(workspaces.output.path)
       command: ["/kaniko/executor"]
       args:
@@ -33,6 +33,8 @@ spec:
         - --context=$(workspaces.output.path)
         - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
+        - --no-push-cache
+        - --max-buffer-size=50000000
         - --single-snapshot
         - --reproducible
         - --verbosity=debug
