@@ -77,7 +77,7 @@ spec:
       taskRef:
         name: influxdb-report
       runAfter:
-        - maven-upload-sonar
+        - kaniko-and-push
       params:
         - name: deployment-name
           value: demo
