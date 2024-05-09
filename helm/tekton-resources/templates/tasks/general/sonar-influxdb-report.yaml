@@ -60,7 +60,7 @@ spec:
     - name: influxdb-report
       image: $(params.registry-url)/influxdb-reports:latest
       imagePullSecrets:
-      - name: quay-pull-se
+      - name: quay-pull-secret
       workingDir: $(workspaces.output.path)
       env:
         - name: LOGIN
