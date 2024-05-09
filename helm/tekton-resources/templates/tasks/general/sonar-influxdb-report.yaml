@@ -127,9 +127,9 @@ spec:
                     exit(0)
 
             # Method to get code duplication percentage
-            def getCodeDuplication(self, project_key):
+            def getCodeDuplication(self, project_key_tenant):
                 url = self.URL_BASE + '/api/measures/component'
-                params = {'component': project_key, 'metricKeys': 'duplicated_lines_density'}
+                params = {'component': project_key_tenant, 'metricKeys': 'duplicated_lines_density'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
                     duplicity_str = response.json()['component']['measures'][0]['value']
@@ -140,9 +140,9 @@ spec:
                     exit(0)
 
             # Method to get coverage
-            def getCoverage(self, project_key):
+            def getCoverage(self, project_key_tenant):
                 url = self.URL_BASE + '/api/measures/component'
-                params = {'component': project_key, 'metricKeys': 'coverage'}
+                params = {'component': project_key_tenant, 'metricKeys': 'coverage'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
                     coverage_str = response.json()['component']['measures'][0]['value']
@@ -152,9 +152,9 @@ spec:
                     exit(0)
 
             # Method to get project status
-            def getProjectStatus(self, project_key):
+            def getProjectStatus(self, project_key_tenant):
                 url = self.URL_BASE + '/api/qualitygates/project_status'
-                params = {'projectKey': project_key}
+                params = {'projectKey': project_key_tenant}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
                     if response.json()['projectStatus']['status'] == 'OK':
@@ -169,13 +169,13 @@ spec:
                     exit(0)
 
             # Method to get issues from the project
-            def getIssuesFromProject(self, project_key):
+            def getIssuesFromProject(self, project_key_tenant):
                 url = self.URL_BASE + '/api/issues/search'
                 manage = False
                 page = 1
                 issues = {'TOTAL': 0, 'INFO': 0, 'MINOR': 0, 'MAJOR': 0, 'CRITICAL': 0, 'BLOCKER': 0}
                 while manage == False:
-                    params = {'componentKeys': project_key, 'p': page}
+                    params = {'componentKeys': project_key_tenant, 'p': page}
                     response = requests.get(url, params=params, auth=self.auth, verify=False)
                     if response.status_code == 200:
                         issues['TOTAL'] = issues['TOTAL'] + len(response.json()['issues'])
@@ -190,9 +190,9 @@ spec:
                 return issues
 
             # Method to get lines of code for the project
-            def getLinesCode(self, project_key):
+            def getLinesCode(self, project_key_tenant):
                 url = self.URL_BASE + '/api/measures/component'
-                params = {'component': project_key, 'metricKeys': 'ncloc'}
+                params = {'component': project_key_tenant, 'metricKeys': 'ncloc'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
                     for i in response.json()['component']['measures']:
@@ -231,7 +231,7 @@ spec:
                     pass
 
             # Method to store data in InfluxDB
-            def storeDataInInfluxDB(self, project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage):
+            def storeDataInInfluxDB(self, project, env, project_element, project_key_tenant_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage):
                 
                 organization = 'DES'
                 client = influxdb_client.InfluxDBClient(url=influxdb_url, bucket=influxdb_bucket, org=organization, token=INFLUXDB_TOKEN)
@@ -253,7 +253,7 @@ spec:
                 print(env)
                 print(project_element)
                 print(framework_tag)
-                print(project_key_tenant)
+                print(project_key_tenant_tenant)
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 
                 write_api = client.write_api(write_options=SYNCHRONOUS)
@@ -264,7 +264,7 @@ spec:
                     .tag('project_tag', project)
                     .tag('Environment_tag', env)
                     .tag('Framework_tag', framework_tag)
-                    .tag('Tenant_tag', project_key_tenant)
+                    .tag('Tenant_tag', project_key_tenant_tenant)
                     .tag('Element_tag', project_element)
                     .field('quality_gate_status', quality_gate_result)
                     .field('blocker', issues['BLOCKER'])
@@ -290,7 +290,7 @@ spec:
             project = '$(params.deployment-name)' 
             env = '$(params.env)'
             project_element = '$(params.project-element)'
-            project_key_tenant = '$(params.project-key-tenant)'
+            project_key_tenant_tenant = '$(params.project-key-tenant)'
             influxdb_url = '$(params.influxdb-url)'  
             influxdb_bucket = '$(params.influxdb-bucket)'
 
@@ -299,11 +299,11 @@ spec:
 
             # Get issues from the project
             print('Getting issues...')
-            issues = sonarQube.getIssuesFromProject(project_key)
+            issues = sonarQube.getIssuesFromProject(project_key_tenant)
 
             # Get project status
             print('Getting Quality Gate status...')
-            quality_gate = sonarQube.getProjectStatus(project_key)
+            quality_gate = sonarQube.getProjectStatus(project_key_tenant)
 
             if quality_gate == 'OK':
                 quality_gate_result = 1
@@ -312,15 +312,15 @@ spec:
 
             # Get code duplication percentage
             print('Getting code duplication...')
-            code_duplication = sonarQube.getCodeDuplication(project_key)
+            code_duplication = sonarQube.getCodeDuplication(project_key_tenant)
 
             # Get coverage
             print('Getting coverage...')
-            coverage = sonarQube.getCoverage(project_key)
+            coverage = sonarQube.getCoverage(project_key_tenant)
             
             print('Storing data into influxdb2 bucket...')
             # Store data in InfluxDB
-            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage)
+            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage)
             print('+++++++++++++++++++++++++++++++++++++++++++')
             print('DATA SUCCESSFULLY STORED')
             print('+++++++++++++++++++++++++++++++++++++++++++')
