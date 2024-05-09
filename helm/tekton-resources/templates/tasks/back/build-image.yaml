@@ -37,6 +37,8 @@ spec:
       description: Holds the Dockerfile and application JAR
   steps:
     - name: build-and-push
+      image: $(params.BUILDER_IMAGE)
+      workingDir: $(workspaces.output.path)
       script: |
         set -e
         echo "Building image $(params.IMAGE) using Kaniko..."
@@ -50,4 +52,4 @@ spec:
           --verbosity=info \
           --build-arg=QUAY_IO_USERNAME=$(params.QUAY_IO_USERNAME) \
           --build-arg=QUAY_IO_PASSWORD=$(params.QUAY_IO_PASSWORD)
-      image: $(params.BUILDER_IMAGE)
+     
