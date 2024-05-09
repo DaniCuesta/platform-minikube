@@ -77,14 +77,13 @@ steps:
           secretKeyRef:
             name: sonar-credentials
             key: token
-      - name: INFLUXDB_TOKEN
-        valueFrom:
-          secretKeyRef:
-            name: influxdb-report-task-tkn
-            key: token
+      # - name: INFLUXDB_TOKEN
+      #   valueFrom:
+      #     secretKeyRef:
+      #       name: influxdb-report-task-tkn
+      #       key: token
     script: |
       INFLUXDB_TKN="UxDdvLxdYdcDwLIEiER7OE"
-
       echo "import requests
       import sys
       import influxdb_client
