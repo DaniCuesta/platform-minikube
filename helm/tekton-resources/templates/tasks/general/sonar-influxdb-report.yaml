@@ -67,7 +67,7 @@ spec:
     - name: project-element
       type: string
       description: project element 
-  steps:
+    steps:
     - name: influxdb-report
         image: $(params.registry-url)/influxdb-reports:latest
         workingDir: $(workspaces.output.path)
@@ -83,6 +83,8 @@ spec:
                 name: influxdb-token
                 key: token
         script: |
+      # Aquí va tu script
+
         
             # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
             # This script is provided in its entirety by the security team.
