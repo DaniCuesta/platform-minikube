@@ -23,11 +23,6 @@ spec:
     - name: TAG
       description: Tag for the image.
       default: latest
-    - name: QUAY_IO_USERNAME
-      description: Username for Quay.io authentication.
-    - name: QUAY_IO_PASSWORD
-      description: Password for Quay.io authentication.
-      type: string
   workspaces:
     - name: output
       description: Holds the Dockerfile and application JAR
@@ -44,6 +39,10 @@ spec:
         - --force
         - --reproducible
         - --verbosity=info
-        - --build-arg=QUAY_IO_USERNAME=$(params.QUAY_IO_USERNAME)
-        - --build-arg=QUAY_IO_PASSWORD=$(params.QUAY_IO_PASSWORD)
+      env:
+        - name: "QUAY_IO_USERNAME"
+          value: "danicuestam"
+        - name: "QUAY_IO_PASSWORD"
+          value: "rC7M8I6W8s"
+
      

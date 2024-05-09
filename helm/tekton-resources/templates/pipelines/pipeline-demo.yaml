@@ -65,10 +65,6 @@ spec:
           value: .
         - name: TAG
           value: v1.0.0 
-        - name: QUAY_IO_USERNAME
-          value: danicuestam
-        - name: QUAY_IO_PASSWORD
-          value: rC7M8I6W8s
       workspaces:
         - name: output
           workspace: shared-workspace
