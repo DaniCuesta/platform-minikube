@@ -35,15 +35,15 @@ spec:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.5.1
       workingDir: $(workspaces.output.path)
-      script: |
-        /kaniko/executor \
-          --dockerfile=$(workspaces.output.path)/Dockerfile \
-          --context=$(workspaces.output.path)/$(params.CONTEXT) \
-          --destination=quay.io/$(params.IMAGE):$(params.TAG) \
-          --skip-tls-verify \
-          --force \
-          --reproducible \
-          --verbosity=info \
-          --build-arg=QUAY_IO_USERNAME=$(params.QUAY_IO_USERNAME) \
-          --build-arg=QUAY_IO_PASSWORD=$(params.QUAY_IO_PASSWORD)
+      command: ["/kaniko/executor"]
+      args:
+        - --dockerfile=$(workspaces.output.path)/Dockerfile
+        - --context=$(workspaces.output.path)/$(params.CONTEXT)
+        - --destination=quay.io/$(params.IMAGE):$(params.TAG)
+        - --skip-tls-verify
+        - --force
+        - --reproducible
+        - --verbosity=info
+        - --build-arg=QUAY_IO_USERNAME=$(params.QUAY_IO_USERNAME)
+        - --build-arg=QUAY_IO_PASSWORD=$(params.QUAY_IO_PASSWORD)
      
