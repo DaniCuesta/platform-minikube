@@ -40,9 +40,18 @@ spec:
         - --reproducible
         - --verbosity=info
       env:
-        - name: "QUAY_IO_USERNAME"
-          value: "danicuestam"
-        - name: "QUAY_IO_PASSWORD"
-          value: "rC7M8I6W8s"
+        - name: "QUAY_CREDENTIALS"
+          value: "/kaniko/.docker/config.json"
+      volumeMounts:
+        - name: docker-config
+          mountPath: /kaniko/.docker
+  volumes:
+    - name: docker-config
+      secret:
+        secretName: quay-kaniko-credentials
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+
 
      
