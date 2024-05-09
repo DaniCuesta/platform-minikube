@@ -39,7 +39,7 @@ spec:
       args:
         - --dockerfile=$(workspaces.output.path)/Dockerfile
         - --context=$(workspaces.output.path)/$(params.CONTEXT)
-        - --destination=quay.io/$(params.IMAGE):$(params.TAG)
+        - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
         - --force
         - --reproducible
