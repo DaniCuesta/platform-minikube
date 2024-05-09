@@ -34,7 +34,7 @@ spec:
         - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
         - --no-push-cache
-        - --max-buffer-size=50000000
+        - --no-push   
         - --single-snapshot
         - --reproducible
         - --verbosity=debug
