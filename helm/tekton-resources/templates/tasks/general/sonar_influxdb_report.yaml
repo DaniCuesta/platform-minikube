@@ -1,0 +1,206 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: influxdb-report
+  namespace: tekton-tasks
+spec:
+  description: >
+    This Task retrieves data from a SonarQube analysis, assesses the project's security, and reports the results. It ensures that the project meets the minimum security requirements.
+
+    Parameters:
+
+    - `deployment-name`: (type: string) The name of the deployment.
+    - `registry-url`: (type: string) The URL of the Harbor repository.
+    - `sonar-url`: (type: string) The route to SonarQube.
+    - `project-key-tenant`: (type: string) The tenant for the project.
+
+    Workspaces:
+
+    - `output`: The workspace containing a Maven project.
+
+    The Task performs the following steps:
+    
+    1. Retrieves the SonarQube URL and login credentials from files.
+
+    2. Defines a SonarQube class to interact with the SonarQube API.
+
+    3. Gets the project key by name.
+
+    4. Gets the project status from the SonarQube API.
+
+    5. Retrieves the issues for the project.
+
+    6. Retrieves the lines of code for the project.
+
+    7. Prints the results of the analysis, including blocker, critical, major, and minor issues.
+
+    8. Checks if the project meets the minimum security requirements based on the issues.
+
+    9. Stores the analysis results in InfluxDB for monitoring.
+
+    10. Displays the final status of the analysis.
+
+  workspaces:
+    - name: output
+      description: The workspace consisting of a Maven project.
+  params:
+    - name: deployment-name
+      type: string
+    - name: registry-url
+      type: string
+      description: Harbor repository URL
+    - name: sonar-url
+      type: string
+      description: SonarQube route URL
+    - name: project-key-tenant
+      type: string
+      description: project tenant
+    - name: influxdb-bucket
+      type: string
+      description: influxdb bucket
+    - name: influxdb-url
+      type: string
+      description: influxdb url
+    - name: env
+      type: string
+      description: project environment
+    - name: project-element
+      type: string
+      description: project element 
+steps:
+  - name: influxdb-report
+    image: $(params.registry-url)/influxdb-reports:v1.0
+    workingDir: $(workspaces.output.path)
+    env:
+      - name: LOGIN
+        valueFrom:
+          secretKeyRef:
+            name: sonar-credentials
+            key: token
+      - name: INFLUXDB_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: influxdb-report-task-tkn
+            key: token
+    script: |
+      INFLUXDB_TKN="UxDdvLxdYdcDwLIEiER7OE"
+
+      echo "import requests
+      import sys
+      import influxdb_client
+      from influxdb_client import InfluxDBClient, Point
+      from influxdb_client.client.write_api import SYNCHRONOUS
+
+      class SonarQube:
+          def __init__(self, url_base, token):
+              self.auth = (token, '')
+              self.URL_BASE = url_base
+
+          def _get(self, endpoint, params=None):
+              url = f'{self.URL_BASE}{endpoint}'
+              response = requests.get(url, auth=self.auth, params=params, verify=False)
+              if response.status_code != 200:
+                  raise Exception(f'Error in API request: {response.status_code} {response.text}')
+              return response.json()
+
+          def get_project_key_by_name(self, project_name):
+              response = self._get('/api/projects/search')
+              for component in response.get('components', []):
+                  if component['name'] == project_name:
+                      return component['key']
+              raise ValueError(f'Project {project_name} not found')
+
+          def get_metric(self, project_key, metric):
+              response = self._get('/api/measures/component', {'component': project_key, 'metricKeys': metric})
+              measures = response['component'].get('measures', [])
+              for measure in measures:
+                  if measure['metric'] == metric:
+                      return measure['value']
+              raise ValueError(f'Metric {metric} not found')
+
+          def get_quality_gate_status(self, project_key):
+              response = self._get('/api/qualitygates/project_status', {'projectKey': project_key})
+              return response['projectStatus']['status']
+
+          def get_issues(self, project_key):
+              page = 1
+              issues = {'TOTAL': 0, 'INFO': 0, 'MINOR': 0, 'MAJOR': 0, 'CRITICAL': 0, 'BLOCKER': 0}
+              while True:
+                  response = self._get('/api/issues/search', {'componentKeys': project_key, 'p': page})
+                  issues['TOTAL'] += len(response['issues'])
+                  for issue in response['issues']:
+                      issues[issue['severity']] += 1
+                  if issues['TOTAL'] == response['total']:
+                      break
+                  page += 1
+              return issues
+
+      class InfluxDBReporter:
+          def __init__(self, url, token, bucket, org='DES'):
+              self.client = InfluxDBClient(url=url, token=token, org=org)
+              self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
+              self.bucket = bucket
+              self.org = org
+
+          def store_sonar_data(self, project, env, project_element, tenant, quality_gate_status, issues, code_duplication, coverage):
+              framework_tag = self._get_framework_tag(project_element)
+              point = Point('sonarqube_metrics')\
+                  .tag('project_tag', project)\
+                  .tag('Environment_tag', env)\
+                  .tag('Framework_tag', framework_tag)\
+                  .tag('Tenant_tag', tenant)\
+                  .tag('Element_tag', project_element)\
+                  .field('quality_gate_status', quality_gate_status)\
+                  .field('blocker', issues['BLOCKER'])\
+                  .field('critical', issues['CRITICAL'])\
+                  .field('major', issues['MAJOR'])\
+                  .field('minor', issues['MINOR'])\
+                  .field('info', issues['INFO'])\
+                  .field('code_duplication', code_duplication)\
+                  .field('coverage', coverage)
+              self.write_api.write(self.bucket, self.org, point)
+
+          def _get_framework_tag(self, project_element):
+              framework_map = {
+                  'back': 'java',
+                  'quarkus': 'quarkus',
+                  'front': 'angular'
+              }
+              return framework_map.get(project_element, 'unknown')
+
+      def main():
+          URL_BASE = 'http://$(params.sonar-url)'
+          TOKEN = '${LOGIN}'
+          INFLUXDB_TOKEN = '${INFLUXDB_TKN}'
+          project_name = '$(params.deployment-name)'
+          project_key_tenant = '$(params.project-key-tenant)'
+          project_key = '{project_name}' 
+
+          influxdb_url = '$(params.influxdb-url)'
+          influxdb_bucket = '$(params.influxdb-bucket)'
+          env = '$(params.env)'
+          project_element = '$(params.project-element)'
+
+          sonarQube = SonarQube(URL_BASE, TOKEN)
+          reporter = InfluxDBReporter(influxdb_url, INFLUXDB_TOKEN, influxdb_bucket)
+
+          print('Getting issues...')
+          issues = sonarQube.get_issues(project_key)
+
+          print('Getting Quality Gate status...')
+          quality_gate_status = sonarQube.get_quality_gate_status(project_key)
+          quality_gate_result = '1' if quality_gate_status == 'OK' else '0'
+
+          print('Getting code duplication...')
+          code_duplication = sonarQube.get_metric(project_key, 'duplicated_lines_density')
+
+          print('Getting coverage...')
+          coverage = sonarQube.get_metric(project_key, 'coverage')
+
+          print('Storing data into InfluxDB...')
+          reporter.store_sonar_data(project_name, env, project_element, project_key_tenant, quality_gate_result, issues, code_duplication, coverage)
+
+      if __name__ == '__main__':
+          main()" > script_sonar.py
+
+      python3 script_sonar.py
