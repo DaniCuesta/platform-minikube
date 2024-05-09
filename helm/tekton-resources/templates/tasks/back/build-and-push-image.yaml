@@ -31,11 +31,10 @@ spec:
       args:
         - --dockerfile=$(workspaces.output.path)/Dockerfile
         - --context=$(workspaces.output.path)
-        - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
+        - --destination=https://quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
-        - --force
-        - --reproducible
-        - --verbosity=info
+        - --single-snapshot
+        - --verbosity=debug
       env:
         - name: "QUAY_CREDENTIALS"
           value: "/kaniko/.docker/config.json"

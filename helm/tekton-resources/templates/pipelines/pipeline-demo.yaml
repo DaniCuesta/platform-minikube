@@ -61,10 +61,8 @@ spec:
       params:
         - name: IMAGE
           value: demo
-        - name: CONTEXT
-          value: .
         - name: TAG
-          value: v1.0.0 
+          value: "v1.0.0"
       workspaces:
         - name: output
           workspace: shared-workspace
