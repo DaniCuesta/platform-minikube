@@ -69,7 +69,7 @@ spec:
       description: project element 
 steps:
   - name: influxdb-report
-    image: $(params.registry-url)/influxdb-reports:v1.0
+    image: $(params.registry-url)/influxdb-reports:latest
     workingDir: $(workspaces.output.path)
     env:
       - name: LOGIN
