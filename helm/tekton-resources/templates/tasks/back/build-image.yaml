@@ -23,21 +23,17 @@ spec:
     - name: TAG
       description: Tag for the image.
       default: latest
-    - name: BUILDER_IMAGE
-      description: The image on which builds will run (default is v1.5.1)
-      default: gcr.io/kaniko-project/executor:v1.5.1
     - name: QUAY_IO_USERNAME
       description: Username for Quay.io authentication.
     - name: QUAY_IO_PASSWORD
       description: Password for Quay.io authentication.
       type: string
-      generate: password
   workspaces:
     - name: output
       description: Holds the Dockerfile and application JAR
   steps:
     - name: build-and-push
-      image: $(params.BUILDER_IMAGE)
+      image: gcr.io/kaniko-project/executor:v1.5.1
       workingDir: $(workspaces.output.path)
       script: |
         set -e
