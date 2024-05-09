@@ -1,0 +1,53 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko-and-push
+  namespace: tekton-tasks
+  labels:
+    app.kubernetes.io/version: "0.6"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev/categories: Image Build
+    tekton.dev/tags: image-build
+    tekton.dev/displayName: "Build and upload container image using Kaniko"
+    tekton.dev/platforms: "linux/amd64,linux/arm64,linux/ppc64le"
+spec:
+  description: >-
+    This Task builds a simple Dockerfile with Kaniko and pushes it to a registry.
+  params:
+    - name: IMAGE
+      description: Name (reference) of the image to build.
+    - name: CONTEXT
+      description: The build context used by Kaniko.
+      default: .
+    - name: TAG
+      description: Tag for the image.
+      default: latest
+    - name: BUILDER_IMAGE
+      description: The image on which builds will run (default is v1.5.1)
+      default: gcr.io/kaniko-project/executor:v1.5.1
+    - name: QUAY_IO_USERNAME
+      description: Username for Quay.io authentication.
+    - name: QUAY_IO_PASSWORD
+      description: Password for Quay.io authentication.
+      type: string
+      generate: password
+  workspaces:
+    - name: output
+      description: Holds the Dockerfile and application JAR
+  steps:
+    - name: build-and-push
+      script: |
+        set -e
+        echo "Building image $(params.IMAGE) using Kaniko..."
+        /kaniko/executor \
+          --dockerfile=$(workspaces.output.path)/Dockerfile \
+          --context=$(workspaces.output.path)/$(params.CONTEXT) \
+          --destination=quay.io/$(params.IMAGE):$(params.TAG) \
+          --skip-tls-verify \
+          --force \
+          --reproducible \
+          --verbosity=info \
+          --build-arg=QUAY_IO_USERNAME=$(params.QUAY_IO_USERNAME) \
+          --build-arg=QUAY_IO_PASSWORD=$(params.QUAY_IO_PASSWORD)
+      image: $(params.BUILDER_IMAGE)

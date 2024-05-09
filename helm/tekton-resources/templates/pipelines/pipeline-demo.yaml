@@ -53,6 +53,26 @@ spec:
         - name: output
           workspace: shared-workspace
 
+    - name: kaniko-and-push
+      taskRef:
+        name: kaniko-and-push
+      runAfter:
+        - maven-upload-sonar
+      params:
+        - name: IMAGE
+          value: demo
+        - name: CONTEXT
+          value: .
+        - name: TAG
+          value: v1.0.0 
+        - name: QUAY_IO_USERNAME
+          value: danicuestam
+        - name: QUAY_IO_PASSWORD
+          value: rC7M8I6W8s
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
     - name: influxdb-report
       taskRef:
         name: influxdb-report
