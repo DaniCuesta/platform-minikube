@@ -36,6 +36,7 @@ spec:
       image: gcr.io/kaniko-project/executor:v1.5.1
       workingDir: $(workspaces.output.path)
       script: |
+        #!/bin/bash
         set -e
         echo "Building image $(params.IMAGE) using Kaniko..."
         /kaniko/executor \
