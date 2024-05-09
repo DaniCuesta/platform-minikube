@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: kaniko-and-push
+  name: build-and-push-image
   namespace: tekton-tasks
   labels:
     app.kubernetes.io/version: "0.6"
