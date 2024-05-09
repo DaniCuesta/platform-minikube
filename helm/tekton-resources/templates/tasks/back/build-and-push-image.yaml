@@ -17,9 +17,6 @@ spec:
   params:
     - name: IMAGE
       description: Name (reference) of the image to build.
-    - name: CONTEXT
-      description: The build context used by Kaniko.
-      default: .
     - name: TAG
       description: Tag for the image.
       default: latest
@@ -33,7 +30,7 @@ spec:
       command: ["/kaniko/executor"]
       args:
         - --dockerfile=$(workspaces.output.path)/Dockerfile
-        - --context=$(workspaces.output.path)/$(params.CONTEXT)
+        - --context=$(workspaces.output.path)
         - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
         - --force
