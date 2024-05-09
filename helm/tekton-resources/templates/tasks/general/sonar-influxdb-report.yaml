@@ -55,7 +55,31 @@ spec:
   workspaces:
     - name: output
       description: The workspace consisting of a Maven project.
-
+  params:
+    - name: deployment-name
+      description: The name of the deployment.
+      type: string
+    - name: registry-url
+      description: The URL of the Harbor repository.
+      type: string
+    - name: sonar-url
+      description: The route to SonarQube.
+      type: string
+    - name: project-key-tenant
+      description: The tenant for the project.
+      type: string
+    - name: influxdb-bucket
+      description: influxdb bucket
+      type: string
+    - name: influxdb-url
+      description: influxdb url
+      type: string
+    - name: env
+      description: project environment
+      type: string
+    - name: project-element
+      description: project element
+      type: string
   steps:
     - name: influxdb-report
       image: $(params.registry-url)/influxdb-reports:latest
