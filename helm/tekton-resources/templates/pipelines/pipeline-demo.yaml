@@ -53,9 +53,9 @@ spec:
         - name: output
           workspace: shared-workspace
 
-    - name: kaniko-and-push
+    - name: build-and-push-image
       taskRef:
-        name: kaniko-and-push
+        name: build-and-push-image
       runAfter:
         - maven-upload-sonar
       params:
@@ -73,11 +73,11 @@ spec:
         - name: output
           workspace: shared-workspace
 
-    - name: influxdb-report
+    - name: sonar-influxdb-report
       taskRef:
-        name: influxdb-report
+        name: sonar-influxdb-report
       runAfter:
-        - kaniko-and-push
+        - build-and-push-image
       params:
         - name: deployment-name
           value: demo
