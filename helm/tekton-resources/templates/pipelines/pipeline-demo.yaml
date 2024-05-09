@@ -64,13 +64,13 @@ spec:
         - name: registry-url
           value: quay.io/danicuestam
         - name: sonar-url
-          value: http://10.101.244.247:9000
+          value: 10.101.244.247:9000
         - name: project-key-tenant
           value: com.example:demo
         - name: influxdb-bucket
           value: SECURITY_METRICS
         - name: influxdb-url
-          value: http://10.100.175.167:8086
+          value: "http://10.100.175.167:8086"
         - name: env
           value: des
         - name: project-element
