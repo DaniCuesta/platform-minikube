@@ -83,7 +83,7 @@ steps:
             name: influxdb-token
             key: token
       script: |
-
+        
         # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
         # This script is provided in its entirety by the security team.
         # Except for the assignment of the parameters in def main()
@@ -270,7 +270,6 @@ steps:
             TOKEN = '${LOGIN}'
             project_name = ''
             INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
-            
             print('Starting the sonarqube analysist script, getting parameters...')
             # Get parameter values
             project = '$(params.deployment-name)' 
