@@ -56,10 +56,8 @@ spec:
 
         mvn clean package -P $(params.profile) -Dmaven.test.skip=true
         # Move to the output workspace and copy .jar files from the target directory
-        cd $(workspaces.output.path)
-        cp $(workspaces.output.path)/target/*.jar .
-
-        # List the contents for verification
+    
+        pwd
         ls
         
         
