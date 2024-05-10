@@ -61,9 +61,10 @@ spec:
           value: "$(params.image)"
       script: |
         #!/usr/bin/env python3
-        import os
-        import json
-        from influxdb_client import InfluxDBClient, Point, WriteOptions
+        import sys
+        import influxdb_client, os, time
+        from influxdb_client import InfluxDBClient, Point
+        from influxdb_client.client.write_api import SYNCHRONOUS
 
         # Obtener las variables de entorno
         influxdb_url = os.getenv("INFLUXDB_URL")
@@ -77,8 +78,8 @@ spec:
         app_name = image_name.split('/')[-1].split(':')[0]
 
         # Conectar con InfluxDB
-        client = InfluxDBClient(url=influxdb_url, token=influxdb_token)
-        write_api = client.write_api(write_options=WriteOptions(batch_size=1))
+        client = InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org)
+        write_api = client.write_api(write_options=SYNCHRONOUS)
 
         # Leer el reporte JSON
         with open(trivy_report_path, "r") as file:
