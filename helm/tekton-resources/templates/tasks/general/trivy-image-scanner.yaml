@@ -26,6 +26,7 @@ spec:
         #!/bin/sh
         set -xe
         trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
+        cat $(workspaces.output.path)/trivy-report.json
   volumes:
     - name: docker-config
       secret:
@@ -33,9 +34,6 @@ spec:
         items:
           - key: .dockerconfigjson
             path: config.json
-    - name: zscaler-ca-cert
-      secret:
-        secretName: zscaler-ca-cert
 
 
 
