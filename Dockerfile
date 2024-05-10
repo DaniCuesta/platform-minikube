@@ -7,4 +7,3 @@ RUN pip install --no-cache-dir requests influxdb-client
 # Establece un directorio de trabajo para evitar conflictos con el entorno base
 WORKDIR /app
 
-CMD ["bin/bash"]

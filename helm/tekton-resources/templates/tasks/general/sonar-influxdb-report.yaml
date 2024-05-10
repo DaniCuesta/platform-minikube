@@ -82,7 +82,7 @@ spec:
       type: string
   steps:
     - name: sonar-scan-influxdb-report
-      image: $(params.registry-url)/influxdb-reports:latest
+      image: $(params.registry-url)/python-influxdb:latest
       imagePullSecrets:
       - name: quay-pull-secret
       workingDir: $(workspaces.output.path)
