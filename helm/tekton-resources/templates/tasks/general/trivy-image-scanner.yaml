@@ -22,8 +22,6 @@ spec:
           mountPath: ~/.docker
       workingDir: $(workspaces.output.path)
       script: |
-        #!/bin/bash
-        set -xe
         image=$(params.image)
         trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$image"
   volumes:
