@@ -94,6 +94,12 @@ spec:
                 if severity in severity_count:
                     severity_count[severity] += 1
 
+        # Mostrar el conteo de vulnerabilidades en un log
+        print(f"App Name: {app_name}")
+        print("Vulnerabilities by Severity:")
+        for severity, count in sorted(severity_count.items(), key=lambda x: x[1], reverse=True):
+            print(f"- {severity.capitalize()}: {count}")
+
         # Crear puntos para la cantidad de cada severidad
         point = Point("trivy_image_vulnerabilities") \
             .tag("app_name", app_name) \
