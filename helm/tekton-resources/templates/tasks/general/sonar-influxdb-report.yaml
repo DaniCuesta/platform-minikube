@@ -81,7 +81,7 @@ spec:
       description: project element
       type: string
   steps:
-    - name: sonar-influxdb-report
+    - name: sonar-scan-influxdb-report
       image: $(params.registry-url)/influxdb-reports:latest
       imagePullSecrets:
       - name: quay-pull-secret
