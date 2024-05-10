@@ -347,7 +347,7 @@ spec:
             lines_code = sonarQube.getLinesCode(project_key_tenant)
 
             # Print project details
-            sonarQube.printProjectDetails(project, env, project_element, quality_gate_result, issues, coverage, duplication, project_status, lines_code)
+            sonarQube.printProjectDetails(project, env, project_element, quality_gate_result, issues, coverage, duplication, lines_code)
 
             # Store data in InfluxDB
             print('Storing data into InfluxDB bucket...')
