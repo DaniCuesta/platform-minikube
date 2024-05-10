@@ -67,9 +67,9 @@ spec:
         - name: output
           workspace: shared-workspace
 
-    - name: trivy-scan
+    - name: trivy-image-scanner
       taskRef:
-        name: trivy-scan
+        name: trivy-image-scanner
       runAfter:
         - build-and-push-image
       params:
@@ -84,7 +84,7 @@ spec:
       taskRef:
         name: sonar-scanner
       runAfter:
-        - trivy-scan
+        - trivy-image-scanner
       params:
         - name: deployment-name
           value: demo
