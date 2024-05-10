@@ -53,11 +53,37 @@ spec:
         - name: output
           workspace: shared-workspace
 
+    - name: sonar-scanner
+      taskRef:
+        name: sonar-scanner
+      runAfter:
+        - maven-upload-sonar
+      params:
+        - name: deployment-name
+          value: demo
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: sonar-url
+          value: 10.101.244.247:9000
+        - name: project-key-tenant
+          value: com.example:demo
+        - name: influxdb-bucket
+          value: SECURITY_METRICS
+        - name: influxdb-url
+          value: "http://10.100.175.167:8086"
+        - name: env
+          value: des
+        - name: project-element
+          value: backend
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
     - name: build-and-push-image
       taskRef:
         name: build-and-push-image
       runAfter:
-        - maven-upload-sonar
+        - sonar-scanner
       params:
         - name: IMAGE
           value: demo
@@ -79,31 +105,5 @@ spec:
         - name: output
           workspace: shared-workspace
       serviceAccountName: quay-access
-
-    - name: sonar-scanner
-      taskRef:
-        name: sonar-scanner
-      runAfter:
-        - trivy-image-scanner
-      params:
-        - name: deployment-name
-          value: demo
-        - name: registry-url
-          value: quay.io/danicuestam
-        - name: sonar-url
-          value: 10.101.244.247:9000
-        - name: project-key-tenant
-          value: com.example:demo
-        - name: influxdb-bucket
-          value: SECURITY_METRICS
-        - name: influxdb-url
-          value: "http://10.100.175.167:8086"
-        - name: env
-          value: des
-        - name: project-element
-          value: backend
-      workspaces:
-        - name: output
-          workspace: shared-workspace
 
         
