@@ -7,9 +7,20 @@ spec:
     - name: image
       type: string
       description: "Image to scan"
+    - name: registry-url
+      description: The URL of the Harbor repository.
+    - name: influxdb-url
+      type: string
+      description: "URL de la instancia de InfluxDB"
+    - name: influxdb-org
+      type: string
+      description: "Nombre de la organización en InfluxDB"
+    - name: influxdb-bucket
+      type: string
+      description: "Bucket en InfluxDB para almacenar los datos"
   workspaces:
     - name: output
-      description: "Workspace to store Trivy results"
+      description: "Workspace para almacenar los resultados de Trivy"
   steps:
     - name: trivy-scan
       image: docker.io/aquasec/trivy:latest
@@ -25,8 +36,75 @@ spec:
       script: |
         #!/bin/sh
         set -xe
-        trivy image --format table -o $(workspaces.output.path)/trivy-report.txt "$(params.image)"
-        cat $(workspaces.output.path)/trivy-report.txt
+        trivy image "$(params.image)"
+        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
+
+    - name: trivy-scan-influxdb-report
+      image: $(params.registry-url)/python-influxdb:latest
+      imagePullSecrets:
+      - name: quay-pull-secret
+      env:
+        - name: INFLUXDB_URL
+          value: "$(params.influxdb-url)"
+        - name: INFLUXDB_ORG
+          value: "$(params.influxdb-org)"
+        - name: INFLUXDB_BUCKET
+          value: "$(params.influxdb-bucket)"
+        - name: INFLUXDB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: influxdb-token
+              key: token
+        - name: TRIVY_REPORT_JSON_PATH
+          value: "$(workspaces.output.path)/trivy-report.json"
+        - name: IMAGE_NAME
+          value: "$(params.image)"
+      script: |
+        #!/usr/bin/env python3
+        import os
+        import json
+        from influxdb_client import InfluxDBClient, Point, WritePrecision
+
+        # Obtener las variables de entorno
+        influxdb_url = os.getenv("INFLUXDB_URL")
+        influxdb_org = os.getenv("INFLUXDB_ORG")
+        influxdb_bucket = os.getenv("INFLUXDB_BUCKET")
+        influxdb_token = os.getenv("INFLUXDB_TOKEN")
+        trivy_report_path = os.getenv("TRIVY_REPORT_JSON_PATH")
+        image_name = os.getenv("IMAGE_NAME")
+
+        # Separar el nombre de la aplicación de la imagen (asumiendo formato repo/app:version)
+        app_name = image_name.split('/')[-1].split(':')[0]
+
+        # Conectar con InfluxDB
+        client = InfluxDBClient(url=influxdb_url, token=influxdb_token)
+        write_api = client.write_api(write_options=WritePrecision.S)
+
+        # Leer el reporte JSON
+        with open(trivy_report_path, "r") as file:
+            trivy_report = json.load(file)
+
+        # Contar las vulnerabilidades por severidad
+        severity_count = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
+        for result in trivy_report.get("Results", []):
+            for vuln in result.get("Vulnerabilities", []):
+                severity = vuln.get("Severity").lower()
+                if severity in severity_count:
+                    severity_count[severity] += 1
+
+        # Crear puntos para la cantidad de cada severidad
+        point = Point("vulnerabilities_count") \
+            .tag("app_name", app_name) \
+            .field("critical", severity_count["critical"]) \
+            .field("high", severity_count["high"]) \
+            .field("medium", severity_count["medium"]) \
+            .field("low", severity_count["low"]) \
+            .field("unknown", severity_count["unknown"])
+
+        # Escribir el resumen de vulnerabilidades a InfluxDB
+        write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=point)
+
+        client.close()
   volumes:
     - name: docker-config
       secret:
@@ -34,6 +112,7 @@ spec:
         items:
           - key: .dockerconfigjson
             path: config.json
+
 
 
 

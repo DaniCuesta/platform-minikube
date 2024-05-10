@@ -101,9 +101,18 @@ spec:
       params:
         - name: image
           value: "quay.io/danicuestam/demo:v1.0.0"
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: influxdb-url
+          value: "http://10.100.175.167:8086"
+        - name: influxdb-org
+          value: "DES"
+        - name: influxdb-bucket
+          value: "SECURITY_METRICS"
       workspaces:
         - name: output
           workspace: shared-workspace
-      serviceAccountName: quay-access
+     
+
 
         
