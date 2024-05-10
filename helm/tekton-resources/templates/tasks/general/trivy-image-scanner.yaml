@@ -7,6 +7,8 @@ spec:
     - name: image
       type: string
       description: "Image to scan"
+    - name: registry-url
+      description: The URL of the Harbor repository.
     - name: influxdb-url
       type: string
       description: "URL de la instancia de InfluxDB"
@@ -36,8 +38,11 @@ spec:
         set -xe
         trivy image "$(params.image)"
         trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
-    - name: upload-to-influxdb
-      image: python-influxdb-client:latest
+
+    - name: trivy-scan-influxdb-report
+      image: $(params.registry-url)/python-influxdb:latest
+      imagePullSecrets:
+      - name: quay-pull-secret
       env:
         - name: INFLUXDB_URL
           value: "$(params.influxdb-url)"
