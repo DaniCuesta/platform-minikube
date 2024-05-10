@@ -82,7 +82,7 @@ spec:
       type: string
   steps:
     - name: sonar-scan-influxdb-report
-      image: $(params.registry-url)/python-influxdb:latest
+      image: $(params.registry-url)/influxdb-reports:latest
       imagePullSecrets:
       - name: quay-pull-secret
       workingDir: $(workspaces.output.path)
@@ -98,8 +98,12 @@ spec:
               name: influxdb-token
               key: token
       script: |
-        #!/usr/bin/env python3
-        import requests
+        #!/bin/bash
+        # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
+        # This script is provided in its entirety by the security team.
+        # Except for the assignment of the parameters in def main()
+
+        echo "import requests
         import sys
         import influxdb_client, os, time
         from influxdb_client import InfluxDBClient, Point
@@ -352,5 +356,7 @@ spec:
             print('DATA SUCCESSFULLY STORED')
             print('+++++++++++++++++++++++++++++++++++++++++++')
 
-        if __name__ == "__main__":
-            main()
+        # Call the main function
+        main()" > script_sonar.py
+
+        python3 script_sonar.py
