@@ -242,16 +242,18 @@ spec:
 
         # Main function
         def main():
-            URL_BASE = 'http://localhost:9000'
-            TOKEN = 'your_sonarqube_token'
-            project_key_tenant = 'your_project_key'
-            influxdb_url = 'http://localhost:8086'
-            INFLUXDB_TOKEN = 'your_influxdb_token'
-            influxdb_bucket = 'your_bucket'
-
-            project = 'your_project_name'
-            env = 'development'
-            project_element = 'back'
+            URL_BASE = 'http://$(params.sonar-url)'
+            TOKEN = '${LOGIN}'
+            project_name = ''
+            INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
+            print('Starting the sonarqube analysist script, getting parameters...')
+            # Get parameter values
+            project = '$(params.deployment-name)' 
+            env = '$(params.env)'
+            project_element = '$(params.project-element)'
+            project_key_tenant = '$(params.project-key-tenant)'
+            influxdb_url = '$(params.influxdb-url)'  
+            influxdb_bucket = '$(params.influxdb-bucket)'
 
             sonarQube = SonarQube(URL_BASE, TOKEN)
             issues = sonarQube.getIssuesFromProject(project_key_tenant)
