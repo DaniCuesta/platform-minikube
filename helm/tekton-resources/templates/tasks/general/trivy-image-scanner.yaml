@@ -32,11 +32,15 @@ spec:
       env:
         - name: "DOCKER_CONFIG"
           value: "/.docker"
+        - name: "TRIVY_INSECURE"
+          value: "true"
       volumeMounts:
         - name: docker-config
           mountPath: /.docker
       workingDir: $(workspaces.output.path)
       script: |
+        #!/bin/sh
+        set -xe
         trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$image"
   volumes:
     - name: docker-config
@@ -48,6 +52,7 @@ spec:
     - name: zscaler-ca-cert
       secret:
         secretName: zscaler-ca-cert
+
 
 
 
