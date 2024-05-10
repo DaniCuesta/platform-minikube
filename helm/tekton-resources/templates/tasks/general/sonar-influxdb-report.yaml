@@ -98,14 +98,12 @@ spec:
               name: influxdb-token
               key: token
       script: |
-        
+        #!/usr/bin/env python3
         # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
         # This script is provided in its entirety by the security team.
         # Except for the assignment of the parameters in def main()
 
-       
         import sys
-        
         import influxdb_client, os, time
         from influxdb_client import InfluxDBClient, Point
         from influxdb_client.client.write_api import SYNCHRONOUS
