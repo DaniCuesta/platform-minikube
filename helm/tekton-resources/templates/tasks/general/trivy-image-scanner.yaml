@@ -104,7 +104,6 @@ spec:
         # Escribir el resumen de vulnerabilidades a InfluxDB
         write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=point)
 
-        client.close()
   volumes:
     - name: docker-config
       secret:
