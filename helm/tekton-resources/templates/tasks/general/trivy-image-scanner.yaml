@@ -11,21 +11,21 @@ spec:
     - name: output
       description: "Workspace to store Trivy results"
   steps:
-    - name: update-ca-certificates
-      image: alpine:3.18
-      volumeMounts:
-        - name: zscaler-ca-cert
-          mountPath: /zscaler-certs
-      script: |
-        #!/bin/sh
-        set -xe
-        # Instalar el paquete de certificados
-        apk add --no-cache ca-certificates
-        # Copiar el certificado raíz personalizado al directorio de certificados
-        mkdir -p /etc/ssl/certs
-        cp /zscaler-certs/zscaler_root.crt /etc/ssl/certs/
-        # Agregar el certificado raíz al sistema de certificados
-        update-ca-certificates
+    # - name: update-ca-certificates
+    #   image: alpine:3.18
+    #   volumeMounts:
+    #     - name: zscaler-ca-cert
+    #       mountPath: /zscaler-certs
+    #   script: |
+    #     #!/bin/sh
+    #     set -xe
+    #     # Instalar el paquete de certificados
+    #     apk add --no-cache ca-certificates
+    #     # Copiar el certificado raíz personalizado al directorio de certificados
+    #     mkdir -p /etc/ssl/certs
+    #     cp /zscaler-certs/zscaler_root.crt /etc/ssl/certs/
+    #     # Agregar el certificado raíz al sistema de certificados
+    #     update-ca-certificates
 
     - name: trivy-scan
       image: docker.io/aquasec/trivy:latest
@@ -41,7 +41,7 @@ spec:
       script: |
         #!/bin/sh
         set -xe
-        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$image"
+        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
   volumes:
     - name: docker-config
       secret:
@@ -52,6 +52,7 @@ spec:
     - name: zscaler-ca-cert
       secret:
         secretName: zscaler-ca-cert
+
 
 
 
