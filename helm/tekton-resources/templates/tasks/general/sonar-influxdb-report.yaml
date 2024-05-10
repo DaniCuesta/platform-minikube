@@ -98,6 +98,7 @@ spec:
               name: influxdb-token
               key: token
       script: |
+        #!/usr/bin/env python3
         import requests
         import sys
         import influxdb_client, os, time
