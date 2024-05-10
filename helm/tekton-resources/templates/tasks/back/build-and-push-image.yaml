@@ -35,7 +35,6 @@ spec:
         - --skip-tls-verify
         - --no-push-cache
         - --single-snapshot
-        - --reproducible
         - --verbosity=info
       env:
         - name: "QUAY_CREDENTIALS"
