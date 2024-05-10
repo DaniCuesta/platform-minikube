@@ -36,7 +36,7 @@ spec:
         - --no-push-cache
         - --single-snapshot
         - --reproducible
-        - --verbosity=debug
+        - --verbosity=info
       env:
         - name: "QUAY_CREDENTIALS"
           value: "/kaniko/.docker/config.json"
