@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: sonar-influxdb-report
+  name: sonar-scanner
   namespace: tekton-tasks
 spec:
   description: >
@@ -81,7 +81,7 @@ spec:
       description: project element
       type: string
   steps:
-    - name: influxdb-report
+    - name: sonar-influxdb-report
       image: $(params.registry-url)/influxdb-reports:latest
       imagePullSecrets:
       - name: quay-pull-secret

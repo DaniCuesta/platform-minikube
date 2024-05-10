@@ -80,9 +80,9 @@ spec:
           workspace: shared-workspace
       serviceAccountName: quay-access
 
-    - name: sonar-influxdb-report
+    - name: sonar-scanner
       taskRef:
-        name: sonar-influxdb-report
+        name: sonar-scanner
       runAfter:
         - trivy-scan
       params:
