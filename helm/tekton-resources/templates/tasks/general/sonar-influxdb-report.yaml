@@ -99,13 +99,8 @@ spec:
               key: token
       script: |
         #!/usr/bin/env python3
-        # You need to put it in a file to be able to run the script with 'python3 script_sonar.py'.
-        # This script is provided in its entirety by the security team.
-        # Except for the assignment of the parameters in def main()
-
-        echo "import requests
-        import sys
-        import influxdb_client, os, time
+        import requests
+        import influxdb_client
         from influxdb_client import InfluxDBClient, Point
         from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -115,20 +110,18 @@ spec:
                 self.auth = (token, '')
                 self.URL_BASE = url_base
 
-            # Method to get project key by name
             def getProjectKeyByName(self, project_name):
-                url = self.URL_BASE + '/api/projects/search'
+                url = f"{self.URL_BASE}/api/projects/search"
                 response = requests.get(url, auth=self.auth, verify=False)
                 if response.status_code == 200:
-                    for i in response.json('components'):
-                        if i['name'] == project_name:
-                            return i['key']
+                    for component in response.json()['components']:
+                        if component['name'] == project_name:
+                            return component['key']
                 else:
                     exit(0)
 
-            # Method to get code duplication percentage
             def getCodeDuplication(self, project_key_tenant):
-                url = self.URL_BASE + '/api/measures/component'
+                url = f"{self.URL_BASE}/api/measures/component"
                 params = {'component': project_key_tenant, 'metricKeys': 'duplicated_lines_density'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
@@ -136,12 +129,11 @@ spec:
                     duplicity = float(duplicity_str.replace('%', ''))
                     return duplicity
                 else:
-                    print('Duplicidad fallida')
+                    print('Error al obtener duplicidad de código')
                     exit(0)
 
-            # Method to get coverage
             def getCoverage(self, project_key_tenant):
-                url = self.URL_BASE + '/api/measures/component'
+                url = f"{self.URL_BASE}/api/measures/component"
                 params = {'component': project_key_tenant, 'metricKeys': 'coverage'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
@@ -149,118 +141,66 @@ spec:
                     coverage = float(coverage_str.replace('%', ''))
                     return coverage
                 else:
+                    print('Error al obtener la cobertura')
                     exit(0)
 
-            # Method to get project status
             def getProjectStatus(self, project_key_tenant):
-                url = self.URL_BASE + '/api/qualitygates/project_status'
+                url = f"{self.URL_BASE}/api/qualitygates/project_status"
                 params = {'projectKey': project_key_tenant}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
-                    if response.json()['projectStatus']['status'] == 'OK':
-                        return 'OK'
-                    elif response.json()['projectStatus']['status'] == 'NONE':
-                        return 'NONE'
-                    elif response.json()['projectStatus']['status'] == 'WARN':
-                        return 'WARN'
-                    elif response.json()['projectStatus']['status'] == 'ERROR':
-                        return 'ERROR'
+                    return response.json()['projectStatus']['status']
                 elif response.status_code == 404:
+                    print('Error: Proyecto no encontrado')
                     exit(0)
 
-            # Method to get issues from the project
             def getIssuesFromProject(self, project_key_tenant):
-                url = self.URL_BASE + '/api/issues/search'
+                url = f"{self.URL_BASE}/api/issues/search"
                 manage = False
                 page = 1
                 issues = {'TOTAL': 0, 'INFO': 0, 'MINOR': 0, 'MAJOR': 0, 'CRITICAL': 0, 'BLOCKER': 0}
-                while manage == False:
+                while not manage:
                     params = {'componentKeys': project_key_tenant, 'p': page}
                     response = requests.get(url, params=params, auth=self.auth, verify=False)
                     if response.status_code == 200:
-                        issues['TOTAL'] = issues['TOTAL'] + len(response.json()['issues'])
-                        for i in response.json()['issues']:
-                            issues[i['severity']] = issues[i['severity']] + 1
+                        issues['TOTAL'] += len(response.json()['issues'])
+                        for issue in response.json()['issues']:
+                            issues[issue['severity']] += 1
                         if issues['TOTAL'] == response.json()['total']:
                             manage = True
                         else:
-                            page = page + 1
+                            page += 1
                     else:
+                        print('Error al obtener las incidencias del proyecto')
                         exit(0)
                 return issues
 
-            # Method to get lines of code for the project
             def getLinesCode(self, project_key_tenant):
-                url = self.URL_BASE + '/api/measures/component'
+                url = f"{self.URL_BASE}/api/measures/component"
                 params = {'component': project_key_tenant, 'metricKeys': 'ncloc'}
                 response = requests.get(url, params=params, auth=self.auth, verify=False)
                 if response.status_code == 200:
-                    for i in response.json()['component']['measures']:
-                        if i['metric'] == 'ncloc':
-                            return i['value']
+                    for measure in response.json()['component']['measures']:
+                        if measure['metric'] == 'ncloc':
+                            return measure['value']
                 else:
+                    print('Error al obtener las líneas de código')
                     exit(0)
 
-            # Method to determine if project passes high severity condition
-            def getHight(linesofcode, issues):
-                if (linesofcode / 500 >= issues['MAJOR']):
-                    return 1
-                else:
-                    return 0
-
-            # Method to determine if project passes low severity condition
-            def getLow(linesofcode, issues):
-                if ((linesofcode / 500) * 100 >= issues['MINOR']):
-                    return 1
-                else:
-                    return 0
-
-            # Method to print results
-            def printResults(self, issues, proyect_key):
-                passCondition(issues, proyect_key)
-
-            # Method to check overall pass condition
-            def passCondition(issues, proyect_key):
-                if (issues['BLOCKER'] | issues['CRITICAL']) != 0:
-                    pass
-                elif (SonarQube.getHight == 0):
-                    pass
-                elif (SonarQube.getLow == 0):
-                    pass
-                else:
-                    pass
-
-            # Method to store data in InfluxDB
             def storeDataInInfluxDB(self, project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, code_duplication, coverage):
-                
                 organization = 'DES'
-                client = influxdb_client.InfluxDBClient(url=influxdb_url, bucket=influxdb_bucket, org=organization, token=INFLUXDB_TOKEN)
-
-                # Determinar el valor de Framework_tag en función de project_element
+                client = InfluxDBClient(url=influxdb_url, org=organization, token=INFLUXDB_TOKEN)
+                framework_tag = 'unknown'
                 if project_element == 'back':
                     framework_tag = 'java'
                 elif project_element == 'quarkus':
                     framework_tag = 'quarkus'
                 elif project_element == 'front':
                     framework_tag = 'angular'
-                else:
-                    framework_tag = 'unknown'
 
-                # print('+++++++++++++++++++++++++++++++++++++++++++')
-                # print('PROJECT INFO:')
-                # print('+++++++++++++++++++++++++++++++++++++++++++')
-                # print(project)
-                # print(env)
-                # print(project_element)
-                # print(framework_tag)
-                # print(project_key_tenant)
-                # print('+++++++++++++++++++++++++++++++++++++++++++')
-                
                 write_api = client.write_api(write_options=SYNCHRONOUS)
-
-                # Crear un punto de datos
                 point = (
-                    Point('sonarqube_metrics''')
+                    Point('sonarqube_metrics')
                     .tag('project_tag', project)
                     .tag('Environment_tag', env)
                     .tag('Framework_tag', framework_tag)
@@ -276,10 +216,8 @@ spec:
                     .field('code_duplication', code_duplication)
                     .field('coverage', coverage)
                 )
-                # Write data into influxdb
                 write_api.write(influxdb_bucket, organization, point)
 
-            # Método para imprimir los detalles del proyecto
             def printProjectDetails(self, project, env, project_element, quality_gate_result, issues, coverage, duplication, lines_code):
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print('PROJECT INFO:')
@@ -291,72 +229,40 @@ spec:
                 print('PROJECT METRICS:')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print(f'Estado del Quality Gate: {quality_gate_result}')
-                print(f'Incidencias Totales: = ' + str(issues['TOTAL']))
-                print('Incidencias BLOQUEANTES = ' + str(issues['BLOCKER']))
-                print('Incidencias CRITICAS = ' + str(issues['CRITICAL']))
-                print('Incidencias ALTAS = ' + str(issues['MAJOR']))
-                print('Incidencias BAJAS = ' + str(issues['MINOR']))
-                print('Incidencias INFORMATIVAS = ' + str(issues['INFO']))
+                print(f'Incidencias Totales: {issues["TOTAL"]}')
+                print(f'Incidencias BLOQUEANTES: {issues["BLOCKER"]}')
+                print(f'Incidencias CRITICAS: {issues["CRITICAL"]}')
+                print(f'Incidencias ALTAS: {issues["MAJOR"]}')
+                print(f'Incidencias BAJAS: {issues["MINOR"]}')
+                print(f'Incidencias INFORMATIVAS: {issues["INFO"]}')
                 print(f'Líneas de código: {lines_code}')
                 print(f'Cobertura: {coverage}%')
                 print(f'Duplicidad de código: {duplication}%')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
 
-
         # Main function
         def main():
-            URL_BASE = 'http://$(params.sonar-url)'
-            TOKEN = '${LOGIN}'
-            project_name = ''
-            INFLUXDB_TOKEN = '${INFLUXDB_TOKEN}'
-            print('Starting the sonarqube analysist script, getting parameters...')
-            # Get parameter values
-            project = '$(params.deployment-name)' 
-            env = '$(params.env)'
-            project_element = '$(params.project-element)'
-            project_key_tenant = '$(params.project-key-tenant)'
-            influxdb_url = '$(params.influxdb-url)'  
-            influxdb_bucket = '$(params.influxdb-bucket)'
+            URL_BASE = 'http://localhost:9000'
+            TOKEN = 'your_sonarqube_token'
+            project_key_tenant = 'your_project_key'
+            influxdb_url = 'http://localhost:8086'
+            INFLUXDB_TOKEN = 'your_influxdb_token'
+            influxdb_bucket = 'your_bucket'
 
-            # Create an instance of SonarQube class
+            project = 'your_project_name'
+            env = 'development'
+            project_element = 'back'
+
             sonarQube = SonarQube(URL_BASE, TOKEN)
-
-            # Get issues from the project
-            print('Getting issues...')
             issues = sonarQube.getIssuesFromProject(project_key_tenant)
-
-            # Get project status
-            print('Getting Quality Gate status...')
             quality_gate = sonarQube.getProjectStatus(project_key_tenant)
-
-            if quality_gate == 'OK':
-                quality_gate_result = 1
-            else:
-                quality_gate_result = 0
-
-            # Get code duplication percentage
-            print('Getting code duplication...')
+            quality_gate_result = 1 if quality_gate == 'OK' else 0
             duplication = sonarQube.getCodeDuplication(project_key_tenant)
-
-            # Get coverage
-            print('Getting coverage...')
             coverage = sonarQube.getCoverage(project_key_tenant)
-
-            # Get lines of code
-            print('Getting lines of code...')
             lines_code = sonarQube.getLinesCode(project_key_tenant)
 
-            # Print project details
             sonarQube.printProjectDetails(project, env, project_element, quality_gate_result, issues, coverage, duplication, lines_code)
-
-            # Store data in InfluxDB
-            print('Storing data into InfluxDB bucket...')
             sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, duplication, coverage)
-            print('+++++++++++++++++++++++++++++++++++++++++++')
-            print('DATA SUCCESSFULLY STORED')
-            print('+++++++++++++++++++++++++++++++++++++++++++')
 
-        # Call the main function
-        main()" > script_sonar.py
-
-        python3 script_sonar.py
+        if __name__ == "__main__":
+            main()
