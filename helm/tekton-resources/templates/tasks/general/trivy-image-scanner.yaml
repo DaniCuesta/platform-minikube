@@ -19,6 +19,8 @@ spec:
       script: |
         #!/bin/sh
         set -xe
+        # Instalar el paquete de certificados
+        apk add --no-cache ca-certificates
         # Copiar el certificado raíz personalizado al directorio de certificados
         mkdir -p /etc/ssl/certs
         cp /zscaler-certs/zscaler_root.crt /etc/ssl/certs/
@@ -30,8 +32,6 @@ spec:
       env:
         - name: "DOCKER_CONFIG"
           value: "/.docker"
-        - name: "SSL_CERT_FILE"
-          value: "/etc/ssl/certs/ca-certificates.crt"
       volumeMounts:
         - name: docker-config
           mountPath: /.docker
