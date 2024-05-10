@@ -2,7 +2,6 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: trivy-scan
-  namespace: tekton-tasks
 spec:
   params:
     - name: image
@@ -10,18 +9,36 @@ spec:
       description: "Image to scan"
   workspaces:
     - name: output
-      description: "The workspace to store Trivy results"
+      description: "Workspace to store Trivy results"
   steps:
+    - name: update-ca-certificates
+      image: alpine:3.18
+      volumeMounts:
+        - name: zscaler-ca-cert
+          mountPath: /zscaler-certs
+      script: |
+        #!/bin/sh
+        set -xe
+        # Copiar el certificado raíz personalizado al directorio de certificados
+        mkdir -p /etc/ssl/certs
+        cp /zscaler-certs/zscaler_root.crt /etc/ssl/certs/
+        # Agregar el certificado raíz al sistema de certificados
+        update-ca-certificates
+
     - name: trivy-scan
       image: docker.io/aquasec/trivy:latest
       env:
         - name: "DOCKER_CONFIG"
-          value: "~/.docker/config.json"
+          value: "/.docker"
+        - name: "SSL_CERT_FILE"
+          value: "/etc/ssl/certs/ca-certificates.crt"
       volumeMounts:
         - name: docker-config
-          mountPath: ~/.docker
+          mountPath: /.docker
       workingDir: $(workspaces.output.path)
       script: |
+        #!/bin/bash
+        set -xe
         image=$(params.image)
         trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$image"
   volumes:
@@ -31,6 +48,10 @@ spec:
         items:
           - key: .dockerconfigjson
             path: config.json
+    - name: zscaler-ca-cert
+      secret:
+        secretName: zscaler-ca-cert
+
 
 
 
