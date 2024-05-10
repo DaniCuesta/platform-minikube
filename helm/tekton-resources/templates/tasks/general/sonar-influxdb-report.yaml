@@ -291,7 +291,7 @@ spec:
                 print('PROJECT METRICS:')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print(f'Estado del Quality Gate: {project_status}')
-                print(f'Incidencias Totales: {issues["TOTAL"]}')
+                print(f'Incidencias Totales: = ' + str(issues['TOTAL']))
                 print('Incidencias BLOQUEANTES = ' + str(issues['BLOCKER']))
                 print('Incidencias CRITICAS = ' + str(issues['CRITICAL']))
                 print('Incidencias ALTAS = ' + str(issues['MAJOR']))
