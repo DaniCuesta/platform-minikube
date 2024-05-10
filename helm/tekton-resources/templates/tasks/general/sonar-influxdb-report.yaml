@@ -322,20 +322,21 @@ spec:
 
             # Get project status
             print('Getting Quality Gate status...')
-            quality_gate = sonarQube.getProjectStatus(project_key_tenant)
+            project_status = sonarQube.getProjectStatus(project_key_tenant)
 
-            if quality_gate == 'OK':
-                quality_gate_result = 1
-            else:
-                quality_gate_result = 0
+            quality_gate_result = 1 if project_status == 'OK' else 0
 
             # Get code duplication percentage
             print('Getting code duplication...')
-            code_duplication = sonarQube.getCodeDuplication(project_key_tenant)
+            duplication = sonarQube.getCodeDuplication(project_key_tenant)
 
             # Get coverage
             print('Getting coverage...')
             coverage = sonarQube.getCoverage(project_key_tenant)
+
+            # Get lines of code
+            print('Getting lines of code...')
+            lines_code = sonarQube.getLinesCode(project_key_tenant)
 
             # Print project details
             sonarQube.printProjectDetails(project, env, project_element, issues, coverage, duplication, project_status, lines_code)
