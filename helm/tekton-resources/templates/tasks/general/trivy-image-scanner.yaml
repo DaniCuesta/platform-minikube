@@ -93,7 +93,7 @@ spec:
                     severity_count[severity] += 1
 
         # Crear puntos para la cantidad de cada severidad
-        point = Point("vulnerabilities_count") \
+        point = Point("trivy_image_vulnerabilities") \
             .tag("app_name", app_name) \
             .field("critical", severity_count["critical"]) \
             .field("high", severity_count["high"]) \
