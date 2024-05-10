@@ -246,15 +246,15 @@ spec:
                 else:
                     framework_tag = 'unknown'
 
-                print('+++++++++++++++++++++++++++++++++++++++++++')
-                print('PROJECT INFO:')
-                print('+++++++++++++++++++++++++++++++++++++++++++')
-                print(project)
-                print(env)
-                print(project_element)
-                print(framework_tag)
-                print(project_key_tenant)
-                print('+++++++++++++++++++++++++++++++++++++++++++')
+                # print('+++++++++++++++++++++++++++++++++++++++++++')
+                # print('PROJECT INFO:')
+                # print('+++++++++++++++++++++++++++++++++++++++++++')
+                # print(project)
+                # print(env)
+                # print(project_element)
+                # print(framework_tag)
+                # print(project_key_tenant)
+                # print('+++++++++++++++++++++++++++++++++++++++++++')
                 
                 write_api = client.write_api(write_options=SYNCHRONOUS)
 
@@ -337,10 +337,12 @@ spec:
             print('Getting coverage...')
             coverage = sonarQube.getCoverage(project_key_tenant)
 
-            sonar.printProjectDetails(issues, coverage, duplication, project_status, lines_code)
-            
+            # Print project details
+            sonarQube.printProjectDetails(project, env, project_element, issues, coverage, duplication, project_status, lines_code)
+
+            # Store data in InfluxDB
             print('Storing data into InfluxDB bucket...')
-            sonar.storeDataInInfluxDB(project, env, project_element, project_key, project_status, influxdb_url, influxdb_token, influxdb_bucket, issues, duplication, coverage)
+            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, project_status, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, duplication, coverage)
             print('+++++++++++++++++++++++++++++++++++++++++++')
             print('DATA SUCCESSFULLY STORED')
             print('+++++++++++++++++++++++++++++++++++++++++++')
