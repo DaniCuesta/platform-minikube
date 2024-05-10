@@ -351,7 +351,7 @@ spec:
 
             # Store data in InfluxDB
             print('Storing data into InfluxDB bucket...')
-            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, quality_gate_result, project_status, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, duplication, coverage)
+            sonarQube.storeDataInInfluxDB(project, env, project_element, project_key_tenant, quality_gate_result, influxdb_url, INFLUXDB_TOKEN, influxdb_bucket, issues, duplication, coverage)
             print('+++++++++++++++++++++++++++++++++++++++++++')
             print('DATA SUCCESSFULLY STORED')
             print('+++++++++++++++++++++++++++++++++++++++++++')
