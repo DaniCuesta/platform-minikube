@@ -99,6 +99,7 @@ spec:
               key: token
       script: |
         #!/usr/bin/env python3
+
         import requests
         import os
         import influxdb_client
@@ -280,4 +281,3 @@ spec:
             print('+++++++++++++++++++++++++++++++++++++++++++')
 
         main()
-
