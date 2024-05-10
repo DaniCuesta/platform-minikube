@@ -67,11 +67,24 @@ spec:
         - name: output
           workspace: shared-workspace
 
+    - name: trivy-scan
+      taskRef:
+        name: trivy-scan
+      runAfter:
+        - build-and-push-image
+      params:
+        - name: image
+          value: "quay.io/danicuestam/demo:v1.0.0"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      serviceAccountName: quay-access
+
     - name: sonar-influxdb-report
       taskRef:
         name: sonar-influxdb-report
       runAfter:
-        - build-and-push-image
+        - trivy-scan
       params:
         - name: deployment-name
           value: demo

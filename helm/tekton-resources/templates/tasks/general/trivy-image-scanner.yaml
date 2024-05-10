@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: trivy-scan
+spec:
+  params:
+    - name: image
+      type: string
+      description: "Image to scan"
+  steps:
+    - name: trivy-scan
+      image: docker.io/aquasec/trivy:latest
+      script: |
+        #!/bin/bash
+        set -xe
+        image=$(params.image)
+        trivy image "$image"
+  serviceAccountName: quay-access
