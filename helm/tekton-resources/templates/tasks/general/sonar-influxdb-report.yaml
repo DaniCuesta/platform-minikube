@@ -279,6 +279,7 @@ spec:
                 # Write data into influxdb
                 write_api.write(influxdb_bucket, organization, point)
 
+            # Método para imprimir los detalles del proyecto
             def printProjectDetails(self, project, env, project_element, issues, coverage, duplication, project_status, lines_code):
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print('PROJECT INFO:')
@@ -290,13 +291,17 @@ spec:
                 print('PROJECT METRICS:')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print(f'Estado del Quality Gate: {project_status}')
-                print(f'Issues Totales: {issues["TOTAL"]}')
-                print(f'Bloqueantes: {issues["BLOCKER"]}, Críticos: {issues["CRITICAL"]}, Mayores: {issues["MAJOR"]}')
-                print(f'Menores: {issues["MINOR"]}, Informativos: {issues["INFO"]}')
+                print(f'Incidencias Totales: {issues["TOTAL"]}')
+                print('Incidencias BLOQUEANTES = ' + str(issues['BLOCKER']))
+                print('Incidencias CRITICAS = ' + str(issues['CRITICAL']))
+                print('Incidencias ALTAS = ' + str(issues['MAJOR']))
+                print('Incidencias BAJAS = ' + str(issues['MINOR']))
+                print('Incidencias INFORMATIVAS = ' + str(issues['INFO']))
                 print(f'Líneas de código: {lines_code}')
                 print(f'Cobertura: {coverage}%')
                 print(f'Duplicidad de código: {duplication}%')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
+
 
         # Main function
         def main():
