@@ -34,7 +34,6 @@ spec:
         - --destination=quay.io/danicuestam/$(params.IMAGE):$(params.TAG)
         - --skip-tls-verify
         - --no-push-cache
-        - --no-push   
         - --single-snapshot
         - --reproducible
         - --verbosity=debug
