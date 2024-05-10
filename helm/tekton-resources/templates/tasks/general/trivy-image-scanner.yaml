@@ -25,8 +25,8 @@ spec:
       script: |
         #!/bin/sh
         set -xe
-        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
-        cat $(workspaces.output.path)/trivy-report.json
+        trivy image --format table -o $(workspaces.output.path)/trivy-report.txt "$(params.image)"
+        cat $(workspaces.output.path)/trivy-report.txt
   volumes:
     - name: docker-config
       secret:
