@@ -280,7 +280,7 @@ spec:
                 write_api.write(influxdb_bucket, organization, point)
 
             # Método para imprimir los detalles del proyecto
-            def printProjectDetails(self, project, env, project_element, issues, coverage, duplication, project_status, lines_code):
+            def printProjectDetails(self, project, env, project_element, quality_gate_result, issues, coverage, duplication, lines_code):
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print('PROJECT INFO:')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
@@ -290,7 +290,7 @@ spec:
                 print('+++++++++++++++++++++++++++++++++++++++++++')
                 print('PROJECT METRICS:')
                 print('+++++++++++++++++++++++++++++++++++++++++++')
-                print(f'Estado del Quality Gate: {project_status}')
+                print(f'Estado del Quality Gate: {quality_gate_result}')
                 print(f'Incidencias Totales: = ' + str(issues['TOTAL']))
                 print('Incidencias BLOQUEANTES = ' + str(issues['BLOCKER']))
                 print('Incidencias CRITICAS = ' + str(issues['CRITICAL']))
@@ -347,7 +347,7 @@ spec:
             lines_code = sonarQube.getLinesCode(project_key_tenant)
 
             # Print project details
-            sonarQube.printProjectDetails(project, env, project_element, issues, coverage, duplication, project_status, lines_code)
+            sonarQube.printProjectDetails(project, env, project_element, quality_gate_result, issues, coverage, duplication, project_status, lines_code)
 
             # Store data in InfluxDB
             print('Storing data into InfluxDB bucket...')
