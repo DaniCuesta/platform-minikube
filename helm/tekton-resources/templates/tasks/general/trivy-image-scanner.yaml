@@ -29,6 +29,8 @@ spec:
           value: "/.docker"
         - name: "TRIVY_INSECURE"
           value: "true"
+        - name: "GITHUB_TOKEN"
+          value: "djE6YXF1YXNlY3VyaXR5L3RyaXZ5LWRiOjE3MTUzOTU4NDkxNjY0Nzc0MTc="
       volumeMounts:
         - name: docker-config
           mountPath: /.docker
