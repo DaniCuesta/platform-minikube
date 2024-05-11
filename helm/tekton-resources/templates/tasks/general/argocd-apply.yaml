@@ -35,7 +35,7 @@ spec:
         }
 
         # Iniciar sesión en Argo CD
-        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
+        yes | argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
 
         # Verificar si el repositorio ya está registrado
         if check_repo_exists; then
