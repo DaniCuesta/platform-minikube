@@ -65,7 +65,6 @@ spec:
         #!/usr/bin/env python3
         import json
         import os
-        import re
         from influxdb_client import InfluxDBClient, Point
         from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -78,7 +77,6 @@ spec:
         image_name_full = os.getenv("IMAGE_NAME")
 
         # Extraer solo el nombre de la aplicación o imagen
-        # Suponiendo que el formato puede variar, podemos usar expresiones regulares para mayor flexibilidad
         image_name = image_name_full.split("/")[-1].split(":")[0]
 
         # Conectar con InfluxDB
@@ -98,6 +96,7 @@ spec:
         severity_count_base = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
         severity_count_app = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
 
+        # Contar las vulnerabilidades
         for result in trivy_report:
             target_type = result["Type"]
             vulnerabilities = result.get("Vulnerabilities", [])
@@ -106,6 +105,11 @@ spec:
                 severity = vuln.get("Severity").lower()
                 if severity in severity_dict:
                     severity_dict[severity] += 1
+
+        # Calcular el total de vulnerabilidades
+        total_base = sum(severity_count_base.values())
+        total_app = sum(severity_count_app.values())
+        total_vulnerabilities = total_base + total_app
 
         # Mostrar los conteos de vulnerabilidades
         print("Vulnerabilidades de la imagen base:")
@@ -116,15 +120,26 @@ spec:
         for key, value in severity_count_app.items():
             print(f"{key.capitalize()}: {value}")
 
+        print(f"\nTotal de vulnerabilidades: {total_vulnerabilities}")
+
         # Crear un punto de datos para todas las vulnerabilidades y enviarlo a InfluxDB
         point = Point("trivy_vulnerabilities") \
-            .tag("image_name", image_name)
-        for severity in severity_count_base:
-            point = point.field(f"{severity}_base", severity_count_base[severity])
-        for severity in severity_count_app:
-            point = point.field(f"{severity}_app", severity_count_app[severity])
+            .tag("image_name", image_name) \
+            .field("total_base", total_base) \
+            .field("total_app", total_app) \
+            .field("total_vulnerabilities", total_vulnerabilities)
 
+        # Agregar cada severidad como un campo para la imagen base
+        for severity, count in severity_count_base.items():
+            point = point.field(f"{severity}_base", count)
+
+        # Agregar cada severidad como un campo para la aplicación
+        for severity, count in severity_count_app.items():
+            point = point.field(f"{severity}_app", count)
+
+        # Escribir el punto con toda la información en InfluxDB
         write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=point)
+
 
 
   volumes:
