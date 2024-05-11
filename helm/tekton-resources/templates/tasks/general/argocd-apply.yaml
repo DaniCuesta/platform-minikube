@@ -30,20 +30,16 @@ spec:
           mountPath: /tmp/ssh-keys  # Ruta accesible para la clave
       env:
         - name: GIT_SSH_COMMAND
-          value: "ssh -o StrictHostKeyChecking=no"
+          value: "ssh -o StrictHostKeyChecking=no -i /tmp/ssh-keys/key"
       script: |
-      
-        ls /tmp/ssh-keys
         cat /tmp/ssh-keys/key
-
         # Iniciar el agente SSH
-        ssh-keygen -p -f /tmp/ssh-keys/key -m PEM -N ""
         eval $(ssh-agent -s)
         ssh-add /tmp/ssh-keys/key
 
-        # Configurar el socket para el agente SSH
-        export SSH_AUTH_SOCK=$(ssh-agent -s | head -n 1 | cut -d ';' -f 1 | cut -d '=' -f 2)
-        
+        # Listar claves para verificar
+        ssh-add -L
+
         # Funciones para comprobar la existencia del repositorio y la aplicación
         check_repo_exists() {
           argocd repo list --insecure | grep -q "$(params.repoURL)"
