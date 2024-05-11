@@ -58,7 +58,7 @@ spec:
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
-          argocd repo add $(params.repoURL) --ssh-private-key-path /tmp/ssh-keys/key --insecure-skip-server-verification
+          argocd repo add $(params.repoURL) --ssh-private-key-path /tmp/ssh-keys/key --insecure-ignore-host-key
         fi
 
         # Verificar y crear la aplicación
