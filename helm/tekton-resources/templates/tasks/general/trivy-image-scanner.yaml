@@ -65,6 +65,7 @@ spec:
         #!/usr/bin/env python3
         import json
         import os
+        import re
         from influxdb_client import InfluxDBClient, Point
         from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -74,7 +75,11 @@ spec:
         influxdb_bucket = os.getenv("INFLUXDB_BUCKET")
         influxdb_token = os.getenv("INFLUXDB_TOKEN")
         trivy_report_path = os.getenv("TRIVY_REPORT_JSON_PATH")
-        image_name = os.getenv("IMAGE_NAME")
+        image_name_full = os.getenv("IMAGE_NAME")
+
+        # Extraer solo el nombre de la aplicación o imagen
+        # Suponiendo que el formato puede variar, podemos usar expresiones regulares para mayor flexibilidad
+        image_name = re.split(r'[/:]', image_name_full)[-1]
 
         # Conectar con InfluxDB
         client = InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org)
