@@ -118,13 +118,14 @@ spec:
 
         # Crear un punto de datos para todas las vulnerabilidades y enviarlo a InfluxDB
         point = Point("trivy_vulnerabilities") \
-            .tag("app_name", image_name)
+            .tag("image_name", image_name)
         for severity in severity_count_base:
             point = point.field(f"{severity}_base", severity_count_base[severity])
         for severity in severity_count_app:
             point = point.field(f"{severity}_app", severity_count_app[severity])
 
         write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=point)
+
 
   volumes:
     - name: docker-config
