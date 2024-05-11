@@ -112,3 +112,23 @@ spec:
       workspaces:
         - name: output
           workspace: shared-workspace
+
+    - name: argocd-apply
+      taskRef:
+        name: argocd-apply
+      runAfter:
+        - trivy-image-scanner
+      params:
+        - name: repoURL
+          value: $(params.url)
+        - name: pathToApplication
+          value: "argocd/application.yaml"
+        - name: argocdServer
+          value: "10.111.72.225:443"
+        - name: argocdUsername
+          value: "admin"
+        - name: argocdPassword
+          value: "KNjQXAcuLco7Vnrp"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
