@@ -8,7 +8,7 @@ spec:
     - name: repoURL
       description: URL del repositorio Git
     - name: pathToApplication
-      description: Ruta relativa hacia el archivo application.yaml en el repositorio clonado
+      description: Ruta relativa hacia el archivo `application.yaml` en el repositorio clonado
     - name: argocdServer
       description: URL del servidor de Argo CD
     - name: argocdUsername
@@ -20,7 +20,7 @@ spec:
   volumes:
     - name: ssh-key
       secret:
-        secretName: github-ssh-key
+        secretName: github-ssh-key  # Reemplaza con el nombre correcto de tu secreto
   steps:
     - name: check-create-deploy
       image: docker.io/argoproj/argocd
@@ -34,23 +34,40 @@ spec:
         - name: GIT_SSH_COMMAND
           value: "ssh -o StrictHostKeyChecking=no"
       script: |
-        # Assumir que o agente SSH está rodando e a chave está adicionada (ou rodar `eval $(ssh-agent)` e `ssh-add`)
-        # Código existente modificado para usar 'yes' para login e assumir configuração SSH
+        # Iniciar el agente SSH
+        eval $(ssh-agent -s)
+        # Añadir la clave privada al agente
+        ssh-add /root/.ssh/id_rsa
+        export SSH_AUTH_SOCK=$(find /tmp -name 'ssh-*/agent.*' 2>/dev/null | head -n 1)
+        
+        # Función para verificar si el repositorio ya está registrado
+        check_repo_exists() {
+          argocd repo list --insecure | grep -q $(params.repoURL)
+          return $?
+        }
+
+        # Función para verificar si la aplicación ya existe
+        check_app_exists() {
+          argocd app list --insecure | grep -q example-helm-app
+          return $?
+        }
+
+        # Iniciar sesión en Argo CD
         yes | argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
 
-        # Verificar se o repositório já está registrado
+        # Verificar si el repositorio ya está registrado
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
-          # Registrar el repositorio si no existe
-          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure-skip-server-verification
+          # Registrar el repositorio usando la clave SSH privada
+          argocd repo add $(params.repoURL) --ssh-private-key-path /root/.ssh/id_rsa --insecure-skip-server-verification
         fi
 
-        # Verificar si la aplicación ya existe
+        # Verificar si la aplicación ya está registrada
         if check_app_exists; then
           echo "La aplicación example-helm-app ya está registrada."
         else
-          # Crear la aplicación usando el archivo application.yaml
+          # Crear la aplicación usando el archivo `application.yaml`
           argocd app create --file $(workspaces.output.path)/$(params.pathToApplication) --insecure
         fi
 
