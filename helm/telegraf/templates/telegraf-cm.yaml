@@ -26,6 +26,14 @@ data:
       [outputs.influxdb_v2.tagpass]
         influxdb_bucket = ["TELEGRAF"]
 
+    [[outputs.influxdb_v2]]
+      urls = ["http://influxdb2:8086"]
+      bucket = "KAFKA"
+      token = "UxDdvLxdYdcDwLIEiER7OE"
+      organization = "DES" 
+      [outputs.influxdb_v2.tagpass]
+        influxdb_bucket = ["KAFKA"]
+
     [[inputs.kube_inventory]]
       url = "https://kubernetes.default.svc"
       bearer_token = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -34,6 +42,15 @@ data:
       namespace = ""
       [inputs.kube_inventory.tags]
         influxdb_bucket = "TELEGRAF"
+
+    [[inputs.zookeeper]]
+      ## Lista de servidores para recolectar métricas.
+      ## Utiliza el nombre del servicio y el puerto interno ya que ambos corren dentro de Minikube.
+      servers = ["zookeeper-service:2181"]
+      ## Tiempo máximo de espera para la recolección de métricas de todos los servidores.
+      timeout = "5s"
+      [inputs.zookeeper.tags]
+        influxdb_bucket = "KAFA"
 
 
 
