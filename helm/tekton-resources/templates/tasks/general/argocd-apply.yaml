@@ -35,14 +35,14 @@ spec:
         }
 
         # Iniciar sesión en Argo CD
-        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
+        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --skip-test-tls 
 
         # Verificar si el repositorio ya está registrado
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
           # Registrar el repositorio si no existe
-          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
+          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure-skip-server-verification
         fi
 
         # Verificar si la aplicación ya existe
