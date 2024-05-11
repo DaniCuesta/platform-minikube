@@ -1,0 +1,114 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-notification-service
+  namespace: tekton-tasks
+spec:
+  params:
+    - name: url
+      type: string
+    - name: revision
+      type: string
+      description: La rama o etiqueta a la que se debe hacer checkout.
+      default: "main"
+  workspaces:
+    - name: shared-workspace
+      description: Workspace compartido donde el repositorio será clonado.
+  tasks:
+    - name: clone-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.url)
+        - name: revision
+          value: $(params.revision)
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: maven-build
+      taskRef:
+        name: maven
+      runAfter:
+        - clone-repository
+      params:
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: profile
+          value: nexus
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: maven-upload-sonar
+      taskRef:
+        name: maven-upload-sonar
+      runAfter:
+        - maven-build
+      params:
+        - name: registry-url
+          value: quay.io/danicuestam
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: sonar-scanner
+      taskRef:
+        name: sonar-scanner
+      runAfter:
+        - maven-upload-sonar
+      params:
+        - name: deployment-name
+          value: notification-service
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: sonar-url
+          value: 10.101.244.247:9000
+        - name: project-key-tenant
+          value: com.example:notification-service
+        - name: influxdb-bucket
+          value: SECURITY_METRICS
+        - name: influxdb-url
+          value: "http://10.96.161.226:8086"
+        - name: env
+          value: des
+        - name: project-element
+          value: backend
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: build-and-push-image
+      taskRef:
+        name: build-and-push-image
+      runAfter:
+        - sonar-scanner
+      params:
+        - name: IMAGE
+          value: notification-service
+        - name: TAG
+          value: "v1.0.0"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: trivy-image-scanner
+      taskRef:
+        name: trivy-image-scanner
+      runAfter:
+        - build-and-push-image
+      params:
+        - name: image
+          value: "quay.io/danicuestam/notification-service:v1.0.0"
+        - name: registry-url
+          value: quay.io/danicuestam
+        - name: influxdb-url
+          value: "http://10.96.161.226:8086"
+        - name: influxdb-org
+          value: "DES"
+        - name: influxdb-bucket
+          value: "SECURITY_METRICS"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
