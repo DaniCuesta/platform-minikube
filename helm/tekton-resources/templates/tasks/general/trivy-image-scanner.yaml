@@ -29,8 +29,8 @@ spec:
           value: "/.docker"
         - name: "TRIVY_INSECURE"
           value: "true"
-        - name: "GITHUB_TOKEN"
-          value: "djE6YXF1YXNlY3VyaXR5L3RyaXZ5LWRiOjE3MTUzOTU4NDkxNjY0Nzc0MTc="
+        # - name: "GITHUB_TOKEN"
+        #   value: "djE6YXF1YXNlY3VyaXR5L3RyaXZ5LWRiOjE3MTUzOTU4NDkxNjY0Nzc0MTc="
       volumeMounts:
         - name: docker-config
           mountPath: /.docker
@@ -38,8 +38,8 @@ spec:
       script: |
         #!/bin/sh
         set -xe
-        trivy image --timeout 10m "$(params.image)"
-        trivy image --timeout 10m --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
+        trivy image "$(params.image)"
+        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
 
     - name: trivy-scan-influxdb-report
       image: $(params.registry-url)/python-influxdb:latest
