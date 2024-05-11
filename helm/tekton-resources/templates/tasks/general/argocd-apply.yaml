@@ -32,8 +32,6 @@ spec:
         - name: GIT_SSH_COMMAND
           value: "ssh -o StrictHostKeyChecking=no"
       script: |
-        # Ajustar permisos del archivo de clave SSH
-        chmod 600 /tmp/ssh-keys/key
         
         # Iniciar el agente SSH
         eval $(ssh-agent -s)
