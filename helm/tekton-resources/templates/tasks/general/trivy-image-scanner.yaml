@@ -93,8 +93,8 @@ spec:
             exit(1)
 
         # Contar las vulnerabilidades por severidad y tipo
-        severity_count_base = {"critical_base": 0, "high_base": 0, "medium_base": 0, "low_base": 0, "unknown_base": 0}
-        severity_count_app = {"critical_app": 0, "high_app": 0, "medium_app": 0, "low_app": 0, "unknown_app": 0}
+        severity_count_base = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
+        severity_count_app = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
 
         for result in trivy_report:
             target_type = result["Type"]
