@@ -37,6 +37,9 @@ spec:
         ssh-keygen -p -f /tmp/ssh-keys/key -m PEM -N ""
         eval $(ssh-agent -s)
         ssh-add /tmp/ssh-keys/key
+
+        ls /tmp/ssh-keys
+        cat /tmp/ssh-keys/key
         
         # Configurar el socket para el agente SSH
         export SSH_AUTH_SOCK=$(ssh-agent -s | head -n 1 | cut -d ';' -f 1 | cut -d '=' -f 2)
