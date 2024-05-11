@@ -34,6 +34,7 @@ spec:
       script: |
         
         # Iniciar el agente SSH
+        ssh-keygen -p -f /tmp/ssh-keys/key -m PEM -N ""
         eval $(ssh-agent -s)
         ssh-add /tmp/ssh-keys/key
         
