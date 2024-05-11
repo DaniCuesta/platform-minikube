@@ -20,7 +20,7 @@ spec:
   volumes:
     - name: ssh-key
       secret:
-        secretName: github-ssh-key  # Asegúrate de que este es el nombre correcto del secreto
+        secretName: github-ssh-key-pem-format  # Asegúrate de que este es el nombre correcto del secreto
   steps:
     - name: check-create-deploy
       image: docker.io/argoproj/argocd
