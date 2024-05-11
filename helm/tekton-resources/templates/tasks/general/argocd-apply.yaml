@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: argocd-apply
-  namesapce: tekton-tasks
+  namespace: tekton-tasks
 spec:
   params:
     - name: repoURL
@@ -17,27 +17,28 @@ spec:
       description: Contraseña para la autenticación de Argo CD
   workspaces:
     - name: output
+  volumes:
+    - name: ssh-key
+      secret:
+        secretName: github-ssh-key
   steps:
     - name: check-create-deploy
       image: docker.io/argoproj/argocd
       workingDir: $(workspaces.output.path)
+      volumeMounts:
+        - name: ssh-key
+          mountPath: /root/.ssh
+      env:
+        - name: SSH_AUTH_SOCK
+          value: /tmp/ssh-agent.sock
+        - name: GIT_SSH_COMMAND
+          value: "ssh -o StrictHostKeyChecking=no"
       script: |
-        # Función para verificar si el repositorio ya está registrado
-        check_repo_exists() {
-          argocd repo list --insecure | grep -q $(params.repoURL)
-          return $?
-        }
-
-        # Función para verificar si la aplicación ya existe
-        check_app_exists() {
-          argocd app list --insecure | grep -q example-helm-app
-          return $?
-        }
-
-        # Iniciar sesión en Argo CD
+        # Assumir que o agente SSH está rodando e a chave está adicionada (ou rodar `eval $(ssh-agent)` e `ssh-add`)
+        # Código existente modificado para usar 'yes' para login e assumir configuração SSH
         yes | argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
 
-        # Verificar si el repositorio ya está registrado
+        # Verificar se o repositório já está registrado
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
@@ -55,4 +56,5 @@ spec:
 
         # Sincronizar la aplicación para asegurar que esté actualizada
         argocd app sync example-helm-app --insecure
+
 
