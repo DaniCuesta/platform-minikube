@@ -32,7 +32,6 @@ spec:
         - name: GIT_SSH_COMMAND
           value: "ssh -o StrictHostKeyChecking=no -i /tmp/ssh-keys/key"
       script: |
-        cat /tmp/ssh-keys/key
         # Iniciar el agente SSH
         eval $(ssh-agent -s)
         ssh-add /tmp/ssh-keys/key
