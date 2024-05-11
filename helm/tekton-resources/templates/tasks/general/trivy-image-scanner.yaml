@@ -63,8 +63,9 @@ spec:
           value: "$(params.image)"
       script: |
         #!/usr/bin/env python3
+        import sys
         import json
-        import os
+        import influxdb_client, os, time
         from influxdb_client import InfluxDBClient, Point
         from influxdb_client.client.write_api import SYNCHRONOUS
 
@@ -76,58 +77,42 @@ spec:
         trivy_report_path = os.getenv("TRIVY_REPORT_JSON_PATH")
         image_name = os.getenv("IMAGE_NAME")
 
+        # Separar el nombre de la aplicación de la imagen (asumiendo formato repo/app:version)
+        app_name = image_name.split('/')[-1].split(':')[0]
+
         # Conectar con InfluxDB
         client = InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org)
         write_api = client.write_api(write_options=SYNCHRONOUS)
 
         # Leer el reporte JSON
-        try:
-            with open(trivy_report_path, "r") as file:
-                data = json.load(file)
-                trivy_report = data if isinstance(data, list) else data.get("results", [])
-                if not isinstance(trivy_report, list):
-                    print("Error: el contenido del reporte de Trivy no está en la forma de lista esperada.")
-                    exit(1)
-        except json.JSONDecodeError as e:
-            print(f"Error al decodificar JSON: {e}")
-            exit(1)
+        with open(trivy_report_path, "r") as file:
+            trivy_report = json.load(file)
 
-        # Contar las vulnerabilidades por severidad y tipo
-        severity_count_base = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
-        severity_count_app = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
+        # Contar las vulnerabilidades por severidad
+        severity_count = {"critical": 0, "high": 0, "medium": 0, "low": 0, "unknown": 0}
+        for result in trivy_report.get("Results", []):
+            for vuln in result.get("Vulnerabilities", []):
+                severity = vuln.get("Severity").lower()
+                if severity in severity_count:
+                    severity_count[severity] += 1
 
-        for result in trivy_report:
-            target_type = result["Type"]
-            vulnerabilities = result.get("Vulnerabilities", [])
-            severity_dict = severity_count_app if target_type == "jar" else severity_count_base
-            for vuln in vulnerabilities:
-                severity = vuln["Severity"].lower() + ('_app' if target_type == 'jar' else '_base')
-                if severity in severity_dict:
-                    severity_dict[severity] += 1
+        # Mostrar el conteo de vulnerabilidades en un log
+        print(f"App Name: {app_name}")
+        print("Vulnerabilities by Severity:")
+        for severity, count in sorted(severity_count.items(), key=lambda x: x[1], reverse=True):
+            print(f"- {severity.capitalize()}: {count}")
 
-        # Mostrar los conteos de vulnerabilidades y enviarlos a InfluxDB
-        print("Vulnerabilidades de la imagen base:")
-        for key, value in severity_count_base.items():
-            print(f"{key.replace('_base', '').capitalize()}: {value}")
-        print("\nVulnerabilidades específicas de la aplicación:")
-        for key, value in severity_count_app.items():
-            print(f"{key.replace('_app', '').capitalize()}: {value}")
+        # Crear puntos para la cantidad de cada severidad
+        point = Point("trivy_image_vulnerabilities") \
+            .tag("app_name", app_name) \
+            .field("critical", severity_count["critical"]) \
+            .field("high", severity_count["high"]) \
+            .field("medium", severity_count["medium"]) \
+            .field("low", severity_count["low"]) \
+            .field("unknown", severity_count["unknown"])
 
-        point = Point("trivy_vulnerabilities") \
-            .tag("app_name", image_name) \
-            .field("critical_base", severity_count_base["critical_base"]) \
-            .field("high_base", severity_count_base["high_base"]) \
-            .field("medium_base", severity_count_base["medium_base"]) \
-            .field("low_base", severity_count_base["low_base"]) \
-            .field("unknown_base", severity_count_base["unknown_base"]) \
-            .field("critical_app", severity_count_app["critical_app"]) \
-            .field("high_app", severity_count_app["high_app"]) \
-            .field("medium_app", severity_count_app["medium_app"]) \
-            .field("low_app", severity_count_app["low_app"]) \
-            .field("unknown_app", severity_count_app["unknown_app"])
-
+        # Escribir el resumen de vulnerabilidades a InfluxDB
         write_api.write(bucket=influxdb_bucket, org=influxdb_org, record=point)
-
 
   volumes:
     - name: docker-config
