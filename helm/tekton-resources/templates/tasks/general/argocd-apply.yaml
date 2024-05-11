@@ -24,25 +24,25 @@ spec:
       script: |
         # Función para verificar si el repositorio ya está registrado
         check_repo_exists() {
-          argocd repo list | grep -q $(params.repoURL)
+          argocd repo list --insecure | grep -q $(params.repoURL)
           return $?
         }
 
         # Función para verificar si la aplicación ya existe
         check_app_exists() {
-          argocd app list | grep -q example-helm-app
+          argocd app list --insecure | grep -q example-helm-app
           return $?
         }
 
         # Iniciar sesión en Argo CD
-        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword)
+        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
 
         # Verificar si el repositorio ya está registrado
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
           # Registrar el repositorio si no existe
-          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword)
+          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword) --insecure
         fi
 
         # Verificar si la aplicación ya existe
@@ -50,8 +50,9 @@ spec:
           echo "La aplicación example-helm-app ya está registrada."
         else
           # Crear la aplicación usando el archivo application.yaml
-          argocd app create --file $(workspaces.output.path)/$(params.pathToApplication)
+          argocd app create --file $(workspaces.output.path)/$(params.pathToApplication) --insecure
         fi
 
         # Sincronizar la aplicación para asegurar que esté actualizada
-        argocd app sync example-helm-app
+        argocd app sync example-helm-app --insecure
+
