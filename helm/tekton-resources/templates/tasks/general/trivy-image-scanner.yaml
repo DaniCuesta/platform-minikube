@@ -79,7 +79,7 @@ spec:
 
         # Extraer solo el nombre de la aplicación o imagen
         # Suponiendo que el formato puede variar, podemos usar expresiones regulares para mayor flexibilidad
-        image_name = re.split(r'[/:]', image_name_full)[-1]
+        image_name = image_name_full.split("/")[-1].split(":")[0]
 
         # Conectar con InfluxDB
         client = InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org)
