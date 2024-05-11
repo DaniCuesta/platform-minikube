@@ -1,0 +1,57 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: argocd-apply
+  namesapce: tekton-tasks
+spec:
+  params:
+    - name: repoURL
+      description: URL del repositorio Git
+    - name: pathToApplication
+      description: Ruta relativa hacia el archivo application.yaml en el repositorio clonado
+    - name: argocdServer
+      description: URL del servidor de Argo CD
+    - name: argocdUsername
+      description: Usuario para la autenticación de Argo CD
+    - name: argocdPassword
+      description: Contraseña para la autenticación de Argo CD
+  workspaces:
+    - name: output
+  steps:
+    - name: check-create-deploy
+      image: docker.io/argoproj/argocd
+      workingDir: $(workspaces.output.path)
+      script: |
+        # Función para verificar si el repositorio ya está registrado
+        check_repo_exists() {
+          argocd repo list | grep -q $(params.repoURL)
+          return $?
+        }
+
+        # Función para verificar si la aplicación ya existe
+        check_app_exists() {
+          argocd app list | grep -q example-helm-app
+          return $?
+        }
+
+        # Iniciar sesión en Argo CD
+        argocd login $(params.argocdServer) --username $(params.argocdUsername) --password $(params.argocdPassword)
+
+        # Verificar si el repositorio ya está registrado
+        if check_repo_exists; then
+          echo "Repositorio $(params.repoURL) ya está registrado."
+        else
+          # Registrar el repositorio si no existe
+          argocd repo add $(params.repoURL) --username $(params.argocdUsername) --password $(params.argocdPassword)
+        fi
+
+        # Verificar si la aplicación ya existe
+        if check_app_exists; then
+          echo "La aplicación example-helm-app ya está registrada."
+        else
+          # Crear la aplicación usando el archivo application.yaml
+          argocd app create --file $(workspaces.output.path)/$(params.pathToApplication)
+        fi
+
+        # Sincronizar la aplicación para asegurar que esté actualizada
+        argocd app sync example-helm-app
