@@ -124,7 +124,7 @@ spec:
         - name: pathToApplication
           value: "argocd/application.yaml"
         - name: argocdServer
-          value: "10.111.72.225:8080"
+          value: "10.111.72.225:443"
         - name: argocdUsername
           value: "admin"
         - name: argocdPassword
