@@ -36,8 +36,8 @@ spec:
       script: |
         #!/bin/sh
         set -xe
-        trivy image "$(params.image)"
-        trivy image --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
+        trivy image --timeout 10m "$(params.image)"
+        trivy image --timeout 10m --format json -o $(workspaces.output.path)/trivy-report.json "$(params.image)"
 
     - name: trivy-scan-influxdb-report
       image: $(params.registry-url)/python-influxdb:latest
