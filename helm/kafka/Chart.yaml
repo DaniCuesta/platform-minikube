@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kafka-service
+description: "A Helm chart for deploying kafka and zookeper"
+version: 1.0.0
