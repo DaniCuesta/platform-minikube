@@ -50,7 +50,7 @@ data:
       ## Tiempo máximo de espera para la recolección de métricas de todos los servidores.
       timeout = "5s"
       [inputs.zookeeper.tags]
-        influxdb_bucket = "KAFA"
+        influxdb_bucket = "KAFKA"
 
 
 
