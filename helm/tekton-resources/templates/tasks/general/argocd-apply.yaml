@@ -45,8 +45,11 @@ spec:
           return $?
         }
 
+        # Extraer el nombre de la aplicación desde repoURL
+        appName=$(basename $(params.repoURL) .git)
+
         check_app_exists() {
-          argocd app list --insecure | grep -q "example-helm-app"
+          argocd app list --insecure | grep -q "$appName"
           return $?
         }
 
@@ -62,12 +65,13 @@ spec:
 
         # Verificar y crear la aplicación
         if check_app_exists; then
-          echo "La aplicación example-helm-app ya está registrada."
+          echo "La aplicación $appName ya está registrada."
         else
-          argocd app create --file $(workspaces.output.path)/$(params.pathToApplication) --insecure
+          argocd app create --file $(workspaces.output.path)/$(params.pathToApplication) --name $appName --insecure
         fi
 
         # Sincronizar la aplicación
-        argocd app sync example-helm-app --insecure
+        argocd app sync $appName --insecure
+
 
 
