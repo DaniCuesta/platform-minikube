@@ -32,12 +32,6 @@ spec:
         - name: GIT_SSH_COMMAND
           value: "ssh -o StrictHostKeyChecking=no"
       script: |
-        # Ajustar permisos del archivo de clave SSH
-        chmod 600 /tmp/ssh-keys/id_rsa
-        
-        # Iniciar el agente SSH
-        eval $(ssh-agent -s)
-        ssh-add /tmp/ssh-keys/id_rsa
         
         # Configurar el socket para el agente SSH
         export SSH_AUTH_SOCK=$(ssh-agent -s | head -n 1 | cut -d ';' -f 1 | cut -d '=' -f 2)
@@ -60,7 +54,7 @@ spec:
         if check_repo_exists; then
           echo "Repositorio $(params.repoURL) ya está registrado."
         else
-          argocd repo add $(params.repoURL) --ssh-private-key-path /tmp/ssh-keys/id_rsa --insecure-skip-server-verification
+          argocd repo add $(params.repoURL) --ssh-private-key-path /tmp/ssh-keys/ssh-key --insecure-skip-server-verification
         fi
 
         # Verificar y crear la aplicación
