@@ -9,7 +9,7 @@ fullnameOverride: ""
 serviceAccount:
   create: true
   name: influxdb2
-  namespace: monitoring
+  namespace: cicd
 
 influxdb:
   name: influxdb2
