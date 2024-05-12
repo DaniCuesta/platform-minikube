@@ -6,8 +6,7 @@ metadata:
   labels:
     app: kafka-service
 spec:
-  type: ClusterIP
-  clusterIP: None
+  type: NodePort
   ports:
   - name: kafka-port
     port: 9092
