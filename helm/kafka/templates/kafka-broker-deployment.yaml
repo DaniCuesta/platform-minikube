@@ -9,11 +9,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-service
+      app: kafka
   template:
     metadata:
       labels:
-        app: kafka-service
+        app: kafka
     spec:
       containers:
       - name: kafka-service
