@@ -52,12 +52,18 @@ data:
       [inputs.zookeeper.tags]
         influxdb_bucket = "KAFKA"
 
-    # Processor para convertir el campo avg_latency a float
+    # Processor para convertir el campo avg_latency a float y cambiar el nombre
+    [[processors.rename]]
+      [[processors.rename.replace]]
+        field = "avg_latency"
+        dest = "avg_latency_float"
+
     [[processors.converter]]
       [processors.converter.fields]
-        float = ["avg_latency"]
-      # Aplicar solo a los datos provenientes de zookeeper
-      namepass = ["zookeeper"]
+        float = ["avg_latency_float"]
+
+    # Aplicar solo a los datos provenientes de zookeeper
+    namepass = ["zookeeper"]
 
 
 
