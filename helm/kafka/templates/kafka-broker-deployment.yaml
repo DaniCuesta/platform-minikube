@@ -27,7 +27,7 @@ spec:
           - name: KAFKA_LISTENERS
             value: "PLAINTEXT://:9092"
           - name: KAFKA_ADVERTISED_LISTENERS
-            value: "PLAINTEXT://kafka-service:9092"
+            value: "PLAINTEXT://10.102.8.124:9092"  # Actualizado con la IP estática
           - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
             value: "PLAINTEXT:PLAINTEXT"
           - name: KAFKA_INTER_BROKER_LISTENER_NAME
@@ -41,6 +41,7 @@ spec:
       - name: kafka-storage
         persistentVolumeClaim:
           claimName: kafka-pvc
+
 
 
 
