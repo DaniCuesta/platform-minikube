@@ -19,7 +19,7 @@ data:
       precision = ""
 
     [[outputs.influxdb_v2]]
-      urls = ["http://influxdb2:8086"]
+      urls = ["http://influxdb2.cicd.svc.cluster.local:8086"]
       bucket = "TELEGRAF"
       token = "UxDdvLxdYdcDwLIEiER7OE"
       organization = "DES" 
@@ -27,7 +27,7 @@ data:
         influxdb_bucket = ["TELEGRAF"]
 
     [[outputs.influxdb_v2]]
-      urls = ["http://influxdb2:8086"]
+      urls = ["http://influxdb2.cicd.svc.cluster.local:8086"]
       bucket = "KAFKA"
       token = "UxDdvLxdYdcDwLIEiER7OE"
       organization = "DES" 
