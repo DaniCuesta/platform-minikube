@@ -53,9 +53,9 @@ data:
         influxdb_bucket = "KAFKA"
 
     [[inputs.kafka_consumer]]
-      brokers = ["kafka-service.kafka.svc.cluster.local:9092"]
-      topics = ["nombre_del_topico"]
-      consumer_group = "telegraf_consumer_group"
+      brokers = ["10.102.8.124:9092"]
+      topics = ["order-topic"]
+      consumer_group = "myGroup"
       offset = "oldest"
       data_format = "influx"
       ## Añadir etiqueta del bucket de InfluxDB específico para los datos de Kafka
