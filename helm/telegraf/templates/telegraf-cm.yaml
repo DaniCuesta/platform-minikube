@@ -56,9 +56,7 @@ data:
     [[processors.converter]]
       [processors.converter.fields]
         float = ["avg_latency"]
-
-    # Este processor solo se aplicará al input zookeeper
-    [[processors.converter.override]]
+      # Aplicar solo a los datos provenientes de zookeeper
       namepass = ["zookeeper"]
 
 
