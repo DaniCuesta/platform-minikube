@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: {{ .Values.selectorLabels.name }}
     app.kubernetes.io/instance: {{ .Values.selectorLabels.instance }}
 data:
-  telegraf.conf: |+
+  KUBE_INVENTORY.conf: |+
     # Correct TOML syntax
     [agent]
       interval = "10s"
@@ -20,11 +20,11 @@ data:
 
     [[outputs.influxdb_v2]]
       urls = ["http://influxdb2.cicd.svc.cluster.local:8086"]
-      bucket = "TELEGRAF"
+      bucket = "KUBE_INVENTORY"
       token = "UxDdvLxdYdcDwLIEiER7OE"
       organization = "DES" 
       [outputs.influxdb_v2.tagpass]
-        influxdb_bucket = ["TELEGRAF"]
+        influxdb_bucket = ["KUBE_INVENTORY"]
 
     [[outputs.influxdb_v2]]
       urls = ["http://influxdb2.cicd.svc.cluster.local:8086"]
@@ -41,7 +41,7 @@ data:
       response_timeout = "5s"
       namespace = ""
       [inputs.kube_inventory.tags]
-        influxdb_bucket = "TELEGRAF"
+        influxdb_bucket = "KUBE_INVENTORY"
 
     [[inputs.zookeeper]]
       ## Lista de servidores para recolectar métricas.
