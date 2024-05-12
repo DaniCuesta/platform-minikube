@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: {{ .Values.selectorLabels.name }}
     app.kubernetes.io/instance: {{ .Values.selectorLabels.instance }}
 data:
-  KUBE_INVENTORY.conf: |+
+  telegraf.conf: |+
     # Correct TOML syntax
     [agent]
       interval = "10s"
