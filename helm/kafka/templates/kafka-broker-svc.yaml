@@ -10,4 +10,4 @@ spec:
       targetPort: 9092 
       protocol: TCP
   selector:
-    app: kafka
+    app: kafka-service
