@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-jmx-exporter-config
+  namespace: kafka
+data:
+  jmx-exporter-config.yml: |
+    # JMX Exporter Configuration for Kafka
+    ---
+    lowercaseOutputName: true
+    lowercaseOutputLabelNames: true
+    whitelistObjectNames: ["kafka.server:type=BrokerTopicMetrics,name=*", "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent", "kafka.network:type=RequestMetrics,name=RequestsPerSec,request=*"]
+    rules:
+    - pattern: kafka.server<type=(.+), name=(.+)PerSec\\w*><>Count
+      name: kafka_server_$1_$2_total
+      type: COUNTER
+    - pattern: kafka.server<type=(.+), name=(.+)><>Count
+      name: kafka_server_$1_$2_total
+      type: COUNTER
+    - pattern: kafka.server<type=(.+), name=(.+), clientId=(.+)><>Value
+      name: kafka_server_$1_$2
+      labels:
+        clientId: "$3"
+      type: GAUGE
+    - pattern: kafka.server<type=(.+), name=(.+), topic=(.+)><>Value
+      name: kafka_server_$1_$2
+      labels:
+        topic: "$3"
+      type: GAUGE
+    - pattern: kafka.network<type=(.+), name=(.+), request=(.+)><>Count
+      name: kafka_network_$1_$2_total
+      labels:
+        request: "$3"
+      type: COUNTER
+    - pattern: kafka.network<type=RequestMetrics, name=RequestsPerSec, request=(.+)><>OneMinuteRate
+      name: kafka_network_requestmetrics_requests_per_sec_one_minute_rate
+      labels:
+        request: "$1"
+      type: GAUGE
+    - pattern: java.lang<type=Memory><HeapMemoryUsage>(.+)
+      name: java_lang_memory_heap_$1
+      type: GAUGE
+    - pattern: java.lang<type=Memory><NonHeapMemoryUsage>(.+)
+      name: java_lang_memory_nonheap_$1
+      type: GAUGE
+    - pattern: java.lang<type=GarbageCollector, name=(.+)><>Count
+      name: java_lang_gc_$1_count
+      type: COUNTER
+    - pattern: java.lang<type=GarbageCollector, name=(.+)><>Time
+      name: java_lang_gc_$1_time
+      type: COUNTER
