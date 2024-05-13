@@ -16,8 +16,6 @@ spec:
       containers:
       - name: kafka-service
         image: quay.io/danicuestam/kafka-custom:3.6.2
-      imagePullSecrets:
-        - name: quay-credentials
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9092
