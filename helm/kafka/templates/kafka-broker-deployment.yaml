@@ -15,7 +15,9 @@ spec:
     spec:
       containers:
       - name: kafka-service
-        image: docker.io/bitnami/kafka:3.6.2
+        image: quay.io/danicuestam/kafka-custom:3.6.2
+      imagePullSecrets:
+        - name: quay-credentials
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9092
