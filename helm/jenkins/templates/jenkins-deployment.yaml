@@ -18,16 +18,19 @@ spec:
         image: docker.io/jenkins/jenkins:jdk17
         ports:
         - containerPort: 8085
-        env:
-        - name: JENKINS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: jenkins-admin-secret
-              key: JENKINS_PASSWORD
         volumeMounts:
         - name: jenkins-home
           mountPath: /var/jenkins_home
+        - name: admin-password
+          mountPath: /var/jenkins_home/secrets
+          readOnly: true
       volumes:
       - name: jenkins-home
         persistentVolumeClaim:
           claimName: jenkins-pvc
+      - name: admin-password
+        secret:
+          secretName: jenkins-admin-password
+          items:
+          - key: initialAdminPassword
+            path: initialAdminPassword
