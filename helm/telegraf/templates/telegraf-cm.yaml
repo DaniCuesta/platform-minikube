@@ -52,7 +52,14 @@ data:
       [inputs.zookeeper.tags]
         influxdb_bucket = "KAFKA"
 
-    # Processor para convertir el campo avg_latency a float y cambiar el nombre
+    [[inputs.prometheus]]
+      urls = ["http://kafka-service.kafka.svc.cluster.local:9308/metrics"]
+      interval = "10s"
+      scrape_timeout = "5s"
+      metric_version = 2
+      [inputs.prometheus.tags]
+        influxdb_bucket = "KAFKA"
+
     [[processors.rename]]
       [[processors.rename.replace]]
         field = "avg_latency"
