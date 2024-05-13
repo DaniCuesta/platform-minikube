@@ -30,7 +30,7 @@ spec:
           claimName: jenkins-pvc
       - name: admin-password
         secret:
-          secretName: jenkins-admin-password
+          secretName: jenkins-admin-secret
           items:
           - key: initialAdminPassword
             path: initialAdminPassword
