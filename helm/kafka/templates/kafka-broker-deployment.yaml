@@ -7,18 +7,16 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka-service  # Debe coincidir con las etiquetas en la plantilla de pod
+      app: kafka-service
   template:
     metadata:
       labels:
-        app: kafka-service  # Etiquetas que coinciden con el selector
+        app: kafka-service
     spec:
       containers:
       - name: kafka-service
         image: quay.io/danicuestam/kafka-custom:3.6.2
         imagePullPolicy: IfNotPresent
-        imagePullSecrets:
-          - name: quay-credentials
         ports:
         - containerPort: 9092
         - containerPort: 5555  # Puerto para exposición de métricas
@@ -53,7 +51,8 @@ spec:
         - name: jmx-exporter-config
           configMap:
             name: kafka-jmx-exporter-config
-
+      imagePullSecrets:
+      - name: quay-credentials
 
 
 
