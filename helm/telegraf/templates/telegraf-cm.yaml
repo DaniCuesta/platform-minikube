@@ -53,7 +53,7 @@ data:
         influxdb_bucket = "KAFKA"
 
     [[inputs.prometheus]]
-      urls = ["http://kafka-service.kafka.svc.cluster.local:9308/metrics"]
+      urls = ["http://kafka-exporter-service.kafka.svc.cluster.local:9308/metrics"]
       interval = "10s"
       metric_version = 2
       [inputs.prometheus.tags]
