@@ -52,17 +52,6 @@ data:
       [inputs.zookeeper.tags]
         influxdb_bucket = "KAFKA"
 
-    [[inputs.kafka_consumer]]
-      brokers = ["10.102.8.124:9092"]
-      topics = ["order-topic"]
-      consumer_group = "myGroup"
-      offset = "oldest"
-      data_format = "influx"
-      ## Añadir etiqueta del bucket de InfluxDB específico para los datos de Kafka
-      [inputs.kafka_consumer.tags]
-        influxdb_bucket = "KAFKA"
-
-
     # Processor para convertir el campo avg_latency a float y cambiar el nombre
     [[processors.rename]]
       [[processors.rename.replace]]
