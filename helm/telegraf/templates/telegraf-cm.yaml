@@ -55,7 +55,6 @@ data:
     [[inputs.prometheus]]
       urls = ["http://kafka-service.kafka.svc.cluster.local:9308/metrics"]
       interval = "10s"
-      scrape_timeout = "5s"
       metric_version = 2
       [inputs.prometheus.tags]
         influxdb_bucket = "KAFKA"
@@ -71,7 +70,6 @@ data:
 
     # Aplicar solo a los datos provenientes de zookeeper
     namepass = ["zookeeper"]
-
 
 
 
