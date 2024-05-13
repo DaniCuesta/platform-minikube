@@ -5,7 +5,13 @@ metadata:
   namespace: kafka
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-service  # Debe coincidir con las etiquetas en la plantilla de pod
   template:
+    metadata:
+      labels:
+        app: kafka-service  # Etiquetas que coinciden con el selector
     spec:
       containers:
       - name: kafka-service
@@ -45,6 +51,7 @@ spec:
         - name: jmx-exporter-config
           configMap:
             name: kafka-jmx-exporter-config
+
 
 
 
