@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: cicd  # Añadido namespace
+  labels:
+    app: jenkins
+spec:
+  ports:
+  - port: 8085  # Cambiado a 8085
+    targetPort: 8085  # Cambiado a 8085
+  selector:
+    app: jenkins
+  type: NodePort
