@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jenkins
-  namespace: cicd
+  namespace: cicd  # Añadido namespace
+  labels:
+    app: jenkins
 spec:
   replicas: 1
   selector:
@@ -15,22 +17,16 @@ spec:
     spec:
       containers:
       - name: jenkins
-        image: docker.io/jenkins/jenkins:jdk17
+        image: jenkins/jenkins:lts
         ports:
-        - containerPort: 8085
+        - containerPort: 8085  # Cambiado a 8085
+        env:
+        - name: JENKINS_OPTS
+          value: "--httpPort=8085"  # Configuración para Jenkins
         volumeMounts:
         - name: jenkins-home
           mountPath: /var/jenkins_home
-        - name: admin-password
-          mountPath: /var/jenkins_home/secrets
-          readOnly: true
       volumes:
       - name: jenkins-home
         persistentVolumeClaim:
           claimName: jenkins-pvc
-      - name: admin-password
-        secret:
-          secretName: jenkins-admin-secret
-          items:
-          - key: JENKINS_PASSWORD
-            path: JENKINS_PASSWORD
