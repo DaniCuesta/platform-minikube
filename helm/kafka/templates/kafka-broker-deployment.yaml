@@ -17,6 +17,8 @@ spec:
       - name: kafka-service
         image: quay.io/danicuestam/kafka-custom:3.6.2
         imagePullPolicy: IfNotPresent
+        imagePullSecrets:
+          - name: quay-credentials
         ports:
         - containerPort: 9092
         - containerPort: 5555  # Puerto para exposición de métricas
