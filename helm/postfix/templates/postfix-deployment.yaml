@@ -1,32 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "postfix.fullname" . }}
+  name: postfix
   labels:
-    {{- include "postfix.labels" . | nindent 4 }}
+    app: postfix
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "postfix.selectorLabels" . | nindent 6 }}
+      app: postfix
   template:
     metadata:
       labels:
-        {{- include "postfix.selectorLabels" . | nindent 8 }}
+        app: postfix
     spec:
       containers:
         - name: postfix
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "yourrepo/postfix:3.5.6"
+          imagePullPolicy: IfNotPresent
           ports:
             - name: smtp
               containerPort: 25
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            limits:
+              cpu: "100m"
+              memory: "128Mi"
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
           volumeMounts:
             - name: config-volume
               mountPath: /etc/postfix
       volumes:
         - name: config-volume
           configMap:
-            name: {{ include "postfix.fullname" . }}-config
+            name: postfix-config
