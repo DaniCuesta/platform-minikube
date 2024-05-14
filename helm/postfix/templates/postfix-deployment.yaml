@@ -1,26 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postfix
+  name: postfixadmin
   labels:
-    app: postfix
+    app: postfixadmin
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postfix
+      app: postfixadmin
   template:
     metadata:
       labels:
-        app: postfix
+        app: postfixadmin
     spec:
       containers:
-        - name: postfix
-          image: "docker.io/postfixadmin:latest"
-          imagePullPolicy: IfNotPresent
+        - name: postfixadmin
+          image: "postfixadmin"
+          env:
+            - name: POSTFIXADMIN_DB_TYPE
+              value: "mysqli"
+            - name: POSTFIXADMIN_DB_HOST
+              value: "whatever"
+            - name: POSTFIXADMIN_DB_USER
+              value: "user"
+            - name: POSTFIXADMIN_DB_PASSWORD
+              value: "topsecret"
+            - name: POSTFIXADMIN_DB_NAME
+              value: "postfixadmin"
           ports:
-            - name: smtp
-              containerPort: 25
+            - containerPort: 80
           resources:
             limits:
               cpu: "100m"
@@ -28,10 +37,3 @@ spec:
             requests:
               cpu: "100m"
               memory: "128Mi"
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/postfix
-      volumes:
-        - name: config-volume
-          configMap:
-            name: postfix-config
