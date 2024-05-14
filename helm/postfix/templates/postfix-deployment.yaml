@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postfix
-          image: "yourrepo/postfix:3.5.6"
+          image: "docker.io/postfixadmin:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - name: smtp
