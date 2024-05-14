@@ -19,12 +19,12 @@ spec:
           image: "docker.io/postfixadmin:3.3.10"
           ports:
             - name: http
-              containerPort: 8087  # Asegúrate de que este puerto esté bien configurado en tu red
+              containerPort: 8087  
           env:
             - name: POSTFIXADMIN_DB_TYPE
               value: "mysqli"
             - name: POSTFIXADMIN_DB_HOST
-              value: "mysql"  # Corregido para coincidir con el nombre del servicio MySQL
+              value: "mysql"  
             - name: POSTFIXADMIN_DB_USER
               value: "postfixuser"
             - name: POSTFIXADMIN_DB_PASSWORD
@@ -33,11 +33,18 @@ spec:
                   name: postfixadmin-db-password
                   key: db-password
             - name: SETUP_PASSWORD
-              value: "mi_contraseña_segura"
+              value: "$2y$10$ZVpgMsxVppC42/SXp67JLeu5rnU3cBqacF0Ujx6FOYhmzgoYBwaz."
           volumeMounts:
+            - name: postfixadmin-config
+              mountPath: /var/www/html/config.local.php
+              subPath: config.local.php
             - name: postfixadmin-data
               mountPath: /var/www/html
       volumes:
+        - name: postfixadmin-config
+          configMap:
+            name: postfixadmin-config
         - name: postfixadmin-data
           persistentVolumeClaim:
             claimName: postfixadmin-pvc
+
