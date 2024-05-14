@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postfixadmin
-          image: "postfixadmin"
+          image: "docker.io/postfixadmin:latest"
           env:
             - name: POSTFIXADMIN_DB_TYPE
               value: "mysqli"
