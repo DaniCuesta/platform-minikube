@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/postfixadmin
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 25
+
+resources:
+  limits:
+    cpu: "100m"
+    memory: "128Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+config:
+  main.cf: |
+    smtpd_banner = $myhostname ESMTP $mail_name
+    biff = no
+    append_dot_mydomain = no
+    readme_directory = no
