@@ -51,7 +51,7 @@ GitHub se utiliza como plataforma para el código fuente y la integración conti
 
 1. **Recolección de Datos**: Telegraf recolecta métricas de `kube_inventory`, `prometheus` y `zookeeper`, y las envía a InfluxDB.
 2. **Proceso de CI/CD**: Tekton maneja el CI de las aplicaciones, generando reportes de calidad de código e imagen que se envían a InfluxDB2.
-3. **Análisis de Código**: Los reportes de `sonar_report` y `trivy_report` son analizados por SonarQube.
+3. **Análisis de Código e Imagen**: Los reportes de `sonar_report` y `trivy_report` son analizados por SonarQube y Trivy respectivamente.
 4. **Orquestación**: Argo coordina la ejecución de tareas y el flujo de trabajo entre los componentes.
 5. **Transmisión de Mensajes**: Kafka maneja la transmisión de datos entre los productores y consumidores.
 6. **Monitoreo y Gestión**: Zookeeper coordina el estado de los nodos de Kafka, mientras que GitHub gestiona el código fuente y los informes de seguridad.
