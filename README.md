@@ -58,8 +58,9 @@ GitHub se utiliza como plataforma para el código fuente y la integración conti
 
 ## Conclusión
 
+La siguiente imagen ilustra cómo la plataforma InfluxDB2 integra varias fuentes de datos, herramientas de recolección y bibliotecas de cliente para proporcionar un monitoreo integral y casos de uso avanzados en tiempo real:
+
+![Plataforma InfluxDB2](./platform.png)
+
 Esta arquitectura integrada permite la recolección, almacenamiento, análisis y reporte eficiente de datos y métricas, asegurando la calidad y seguridad de las aplicaciones en un entorno de Kubernetes.
-
----
-
 
