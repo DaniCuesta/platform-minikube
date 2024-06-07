@@ -63,21 +63,35 @@ A continuación, se presentan capturas de pantalla que ilustran el funcionamient
 ### Tasks de Pipelines
 
 #### Task de SonarQube
+La siguiente captura muestra la task de la pipeline encargada de generar y enviar el reporte de análisis de SonarQube.
 ![Task de SonarQube muestra y envía reporte de análisis en Sonar](./sonar_report.png)
 
 #### Tasks de Trivy
+La primera captura muestra la task de la pipeline de Trivy que realiza el análisis y muestra los resultados en pantalla.
 ![Task de Trivy para mostrar el resultado del análisis por pantalla](./trivy_scan.png)
+La segunda captura muestra la task de la pipeline de Trivy que envía un reporte con los resultados a InfluxDB2.
 ![Task de Trivy que envía un reporte con los resultados a InfluxDB2](./trivy_report.png)
 
 ### Dashboards en InfluxDB2
 
+La siguiente captura muestra los dashboards en InfluxDB2 que permiten visualizar el estado actual y la progresión en el tiempo de los datos de SonarQube y Trivy de cada aplicación.
 ![Dashboards](./influxdb_dashboards.png)
 
 #### Dashboard de SonarQube
+La captura siguiente muestra el dashboard específico para los datos de SonarQube en InfluxDB2.
 ![Dashboard de SonarQube](./sonar_dashboard.png)
 
 #### Dashboard de Trivy
+La captura siguiente muestra el dashboard específico para los datos de Trivy en InfluxDB2.
 ![Dashboard de Trivy](./trivy_dashboard.png)
+
+## Conclusión
+
+La siguiente imagen ilustra cómo la plataforma InfluxDB2 integra varias fuentes de datos, herramientas de recolección y bibliotecas de cliente para proporcionar un monitoreo integral y casos de uso avanzados en tiempo real:
+
+![Plataforma InfluxDB2](./platform.png)
+
+Esta arquitectura integrada permite la recolección, almacenamiento, análisis y reporte eficiente de datos y métricas, asegurando la calidad y seguridad de las aplicaciones en un entorno de Kubernetes.
 
 ## Conclusión
 
