@@ -63,13 +63,13 @@ A continuación, se presentan capturas de pantalla que ilustran el funcionamient
 ### Tasks de Pipelines
 
 #### Task de SonarQube
-La siguiente captura muestra la task de la pipeline encargada de generar y enviar el reporte de análisis de SonarQube.
+La siguiente captura muestra el step de la task de la pipeline encargada de generar y enviar el reporte de análisis de SonarQube.
 ![Task de SonarQube muestra y envía reporte de análisis en Sonar](./sonar_report.png)
 
 #### Tasks de Trivy
-La primera captura muestra la task de la pipeline de Trivy que realiza el análisis y muestra los resultados en pantalla.
+La primera captura muestra el step de la task de la pipeline de Trivy que realiza el análisis y muestra los resultados en pantalla.
 ![Task de Trivy para mostrar el resultado del análisis por pantalla](./trivy_scan.png)
-La segunda captura muestra la task de la pipeline de Trivy que envía un reporte con los resultados a InfluxDB2.
+La segunda captura muestra el step de la task de la pipeline de Trivy que envía un reporte con los resultados a InfluxDB2.
 ![Task de Trivy que envía un reporte con los resultados a InfluxDB2](./trivy_report.png)
 
 ### Dashboards en InfluxDB2
