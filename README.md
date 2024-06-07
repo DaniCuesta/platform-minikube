@@ -45,7 +45,7 @@ Kafka actúa como un broker de mensajes, facilitando la transmisión de datos en
 Zookeeper se utiliza para coordinar la configuración y el estado de los nodos de Kafka y otros servicios distribuidos.
 
 ### GitHub
-GitHub se utiliza como plataforma para el código fuente y la integración continua. Los informes de seguridad y calidad de código se gestionan a través de GitHub, facilitando la colaboración y la integración del código.
+GitHub se utiliza como plataforma para el código fuente.
 
 ## Flujo de Trabajo
 
@@ -54,7 +54,7 @@ GitHub se utiliza como plataforma para el código fuente y la integración conti
 3. **Análisis de Código e Imagen**: Los reportes de `sonar_report` y `trivy_report` son analizados por SonarQube y Trivy respectivamente.
 4. **Orquestación**: Argo coordina la ejecución de tareas y el flujo de trabajo entre los componentes.
 5. **Transmisión de Mensajes**: Kafka maneja la transmisión de datos entre los productores y consumidores.
-6. **Monitoreo y Gestión**: Zookeeper coordina el estado de los nodos de Kafka, mientras que GitHub gestiona el código fuente y los informes de seguridad.
+6. **Monitoreo y Gestión**: Zookeeper coordina el estado de los nodos de Kafka.
 
 ## Conclusión
 
