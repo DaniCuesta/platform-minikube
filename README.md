@@ -56,6 +56,29 @@ GitHub se utiliza como plataforma para el código fuente.
 5. **Transmisión de Mensajes**: Kafka maneja la transmisión de datos entre los productores y consumidores.
 6. **Monitoreo y Gestión**: Zookeeper coordina el estado de los nodos de Kafka.
 
+## Resultados
+
+A continuación, se presentan capturas de pantalla que ilustran el funcionamiento de las tasks de las pipelines encargadas de llevar a cabo los reportes de SonarQube y Trivy, así como los dashboards en InfluxDB2 que muestran el estado actual y la progresión en el tiempo de los datos de SonarQube y Trivy de cada aplicación.
+
+### Tasks de Pipelines
+
+#### Task de SonarQube
+![Task de SonarQube muestra y envía reporte de análisis en Sonar](./sonar_report.png)
+
+#### Tasks de Trivy
+![Task de Trivy para mostrar el resultado del análisis por pantalla](./trivy_scan.png)
+![Task de Trivy que envía un reporte con los resultados a InfluxDB2](./trivy_report.png)
+
+### Dashboards en InfluxDB2
+
+![Dashboards](./influxdb_dashboards.png)
+
+#### Dashboard de SonarQube
+![Dashboard de SonarQube](./sonar_dashboard.png)
+
+#### Dashboard de Trivy
+![Dashboard de Trivy](./trivy_dashboard.png)
+
 ## Conclusión
 
 La siguiente imagen ilustra cómo la plataforma InfluxDB2 integra varias fuentes de datos, herramientas de recolección y bibliotecas de cliente para proporcionar un monitoreo integral y casos de uso avanzados en tiempo real:
